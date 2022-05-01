@@ -1,12 +1,26 @@
 const express = require('express');
 const cookieSession = require("cookie-session");
 
-const { 
+const {
   getSessionFromStorage,
   getSessionIdFromStorageAll,
   Session
 } = require("@inrupt/solid-client-authn-node");
-
+const{
+  getSolidDataset,
+  getThing,
+  saveSolidDatasetAt,
+  createThing,
+  buildThing,
+  setThing,
+  createSolidDataset
+}=require("@inrupt/solid-client");
+const{
+  FOAF,
+  VCARD,
+  RDF,
+  SCHEMA_INRUPT
+}=require("@inrupt/vocab-common-rdf");
 var app = express();
 app.use(express.logger());
 
@@ -44,35 +58,51 @@ app.get('/', async function(req, res)
     // URL, with the data necessary to complete the authentication process
     // appended as query parameters:
     redirectUrl: `http://localhost:${5000}/afterLogin`,
-    // Set to the user's Solid Identity Provider; e.g., "https://broker.pod.inrupt.com" 
+    // Set to the user's Solid Identity Provider; e.g., "https://broker.pod.inrupt.com"
     oidcIssuer: "https://broker.pod.inrupt.com",
-    // Pick an application name that will be shown when asked 
+    // Pick an application name that will be shown when asked
     // to approve the application's access to the requested data.
     clientName: "Demo app",
     handleRedirect: redirectToSolidIdentityProvider,
   });
-  
-});
 
+});
+var port = process.env.PORT || 5000;
 app.get("/afterLogin", async (req, res) => {
   // 3. If the user is sent back to the `redirectUrl` provided in step 2,
   //    it means that the login has been initiated and can be completed. In
-  //    particular, initiating the login stores the session in storage, 
+  //    particular, initiating the login stores the session in storage,
   //    which means it can be retrieved as follows.
   const session = await getSessionFromStorage(req.session.sessionId);
 
-  // 4. With your session back from storage, you are now able to 
+  // 4. With your session back from storage, you are now able to
   //    complete the login process using the data appended to it as query
   //    parameters in req.url by the Solid Identity Provider:
   await session.handleIncomingRedirect(`http://localhost:${port}${req.url}`);
 
+
+  //send data to solid pot
+  let courseSolidDataset = createSolidDataset();
+  const newBookThing1 = buildThing(createThing({ name: "book1" }))
+    .addStringNoLocale(SCHEMA_INRUPT.name, "ABC123 of Example Literature")
+    .addUrl(RDF.type, "https://schema.org/Book")
+    .build();
+  courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
+  const savedSolidDataset = await saveSolidDatasetAt(
+    "https://pod.inrupt.com/omarmahmoud/public/no",
+    courseSolidDataset,
+    { fetch: fetch }             // fetch from authenticated Session
+  );
+
+
   // 5. `session` now contains an authenticated Session instance.
   if (session.info.isLoggedIn) {
-    return res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
+    res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
   }
 });
 
-var port = process.env.PORT || 5000;
+
+
 
 app.listen(port, function()
 {
