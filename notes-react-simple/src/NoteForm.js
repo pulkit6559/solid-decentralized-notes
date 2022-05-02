@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { Redirect } from 'react-router';
+var axios = require('axios')
 
 const divStyle = {
     display: 'none'
@@ -19,11 +20,19 @@ class NoteForm extends Component {
         if (this.title.value === "") {
             alert("Title is needed");
         } else {
+            this.id.value = this.id.value + 1;
             const note = {
                 id: Number(this.id.value),
                 title: this.title.value,
                 description: this.description.value
             }
+            axios
+            .post('http://localhost:5000/reactNote', note)
+            .then(() => console.log('Book Created'))
+            .catch(err => {
+              console.error(err);
+            });
+
             this.props.persistNote(note);
             this.setState({redirect: true});
         }
