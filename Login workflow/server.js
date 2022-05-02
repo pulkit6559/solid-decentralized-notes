@@ -24,6 +24,12 @@ const{
 var app = express();
 app.use(express.logger());
 
+var cors = require('cors');
+app.use(cors());
+
+
+app.use(express.urlencoded())
+app.use(express.json())
 
 app.use(
   cookieSession({
@@ -78,18 +84,13 @@ app.get("/afterLogin", async (req, res) => {
   // 4. With your session back from storage, you are now able to
   //    complete the login process using the data appended to it as query
   //    parameters in req.url by the Solid Identity Provider:
-  await session.handleIncomingRedirect(`http://localhost:${port}${req.url}`);
+  // await session.handleIncomingRedirect(`http://localhost:${port}${req.url}`);
 
 
-  //send data to solid pot
-  let courseSolidDataset = createSolidDataset();
-  const newBookThing1 = buildThing(createThing({ name: "book1" }))
-    .addStringNoLocale(SCHEMA_INRUPT.name, "ABC123 of Example Literature")
-    .addUrl(RDF.type, "https://schema.org/Book")
-    .build();
+
   courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
   const savedSolidDataset = await saveSolidDatasetAt(
-    "https://pod.inrupt.com/omarmahmoud/public/no",
+    "https://pod.inrupt.com/pulkit6559/public/newNote7",
     courseSolidDataset,
     { fetch: fetch }             // fetch from authenticated Session
   );
@@ -99,6 +100,34 @@ app.get("/afterLogin", async (req, res) => {
   if (session.info.isLoggedIn) {
     res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
   }
+  else{
+    res.send(`<p>NOT Logged in with the WebID ${session.info.webId}.</p>`)
+  }
+});
+
+app.post("/reactNote", async (req, res) => {
+  console.log("Here!")
+  console.log(req.body)
+  let courseSolidDataset = createSolidDataset();
+  const newBookThing1 = buildThing(createThing({ name: req.body.title }))
+    .addStringNoLocale(SCHEMA_INRUPT.name, "react generated note")
+    .addStringNoLocale(SCHEMA_INRUPT.description, req.body.description)
+    .addStringNoLocale(SCHEMA_INRUPT.text, req.body.description)
+    .addUrl(RDF.type, "https://schema.org/TextDigitalDocument")
+    .build();
+
+
+  courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
+  // courseSolidDataset2 = setThing(courseSolidDataset2, newTextThing2);
+
+  const savedSolidDataset = await saveSolidDatasetAt(
+    "https://pod.inrupt.com/pulkit6559/public/reactNote"+req.body.id,
+    courseSolidDataset,
+    { fetch: fetch }             // fetch from authenticated Session
+  );
+  console.log("Here! Done writing")
+  res.send(`sent data to pod`);
+
 });
 
 
