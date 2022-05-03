@@ -25,6 +25,7 @@ var app = express();
 app.use(express.logger());
 
 var cors = require('cors');
+const { graph } = require('rdflib');
 app.use(cors());
 
 
@@ -55,7 +56,8 @@ app.get('/', async function(req, res)
     // given URL, but the specific method of redirection depend on your app's particular setup.
     // For example, if you are writing a command line app, this might simply display a prompt for
     // the user to visit the given URL in their browser.
-    res.redirect(url);
+    res.redirect("http://localhost:3000/");
+    // res.redirect(url);
   };
   // 2. Start the login process; redirect handler will handle sending the user to their
   //    Solid Identity Provider.
@@ -87,13 +89,12 @@ app.get("/afterLogin", async (req, res) => {
   // await session.handleIncomingRedirect(`http://localhost:${port}${req.url}`);
 
 
-
-  courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
-  const savedSolidDataset = await saveSolidDatasetAt(
-    "https://pod.inrupt.com/pulkit6559/public/newNote7",
-    courseSolidDataset,
-    { fetch: fetch }             // fetch from authenticated Session
-  );
+  // courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
+  // const savedSolidDataset = await saveSolidDatasetAt(
+  //   "https://pod.inrupt.com/pulkit6559/public/newNote7",
+  //   courseSolidDataset,
+  //   { fetch: fetch }             // fetch from authenticated Session
+  // );
 
 
   // 5. `session` now contains an authenticated Session instance.
@@ -101,7 +102,7 @@ app.get("/afterLogin", async (req, res) => {
     res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
   }
   else{
-    res.send(`<p>NOT Logged in with the WebID ${session.info.webId}.</p>`)
+    res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
   }
 });
 
@@ -121,15 +122,40 @@ app.post("/reactNote", async (req, res) => {
   // courseSolidDataset2 = setThing(courseSolidDataset2, newTextThing2);
 
   const savedSolidDataset = await saveSolidDatasetAt(
-    "https://pod.inrupt.com/pulkit6559/public/reactNote"+req.body.id,
+    "https://pod.inrupt.com/pulkit6559/Notesdump/" + req.body.title + "_" +req.body.id,
     courseSolidDataset,
     { fetch: fetch }             // fetch from authenticated Session
   );
   console.log("Here! Done writing")
   res.send(`sent data to pod`);
-
 });
 
+
+app.get("/readAllNotes", async (req, res) => {
+
+  const notes_url = "https://pod.inrupt.com/pulkit6559/Notesdump/";
+  const myDataset = await getSolidDataset(
+    "https://pod.inrupt.com/pulkit6559/Notesdump/",
+    { fetch: fetch }          // fetch from authenticated session
+  );
+
+  // console.log(myDataset)
+  console.log(myDataset.graphs.default)
+
+  notesFolder = myDataset.graphs.default
+
+  for (const entry of Object.entries(notesFolder)) {
+    if (entry[0]=="https://pod.inrupt.com/pulkit6559/Notesdump/"){
+      console.log("USELESS");
+    }
+    else{
+    console.log(entry);
+    }
+  }
+
+  res.send(myDataset.graphs.default);
+  
+});
 
 
 
