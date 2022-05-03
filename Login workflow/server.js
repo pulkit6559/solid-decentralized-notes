@@ -159,6 +159,26 @@ app.get("/readAllNotes", async (req, res) => {
   
 });
 
+app.post("/storetoPublicPod", async (req, res) => {
+  let courseSolidDataset = createSolidDataset();
+  //req tansfer the name of the file and its id. the prefix should be decided accourding to different user
+  const newBookThing1 = buildThing(createThing({ name: req.body.title }))
+    .addStringNoLocale(SCHEMA_INRUPT.text, "https://pod.inrupt.com/pulkit6559/Notesdump/" + req.body.title + "_" +req.body.id)
+    .build();
+
+
+  courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
+  // courseSolidDataset2 = setThing(courseSolidDataset2, newTextThing2);
+
+  const savedSolidDataset = await saveSolidDatasetAt(
+    "https://pod.inrupt.com/leslie/publicSolidPodFile/" + req.body.title,
+    courseSolidDataset,
+    { fetch: fetch }             // fetch from authenticated Session
+  );
+  console.log("Here! Done ")
+  res.send(`store data to solidpublicpod`);
+});
+
 
 
 app.listen(port, function()
