@@ -56,7 +56,7 @@ app.get('/', async function(req, res)
     // given URL, but the specific method of redirection depend on your app's particular setup.
     // For example, if you are writing a command line app, this might simply display a prompt for
     // the user to visit the given URL in their browser.
-    res.redirect("http://localhost:3000/");
+    res.redirect(url);
     // res.redirect(url);
   };
   // 2. Start the login process; redirect handler will handle sending the user to their
@@ -99,10 +99,12 @@ app.get("/afterLogin", async (req, res) => {
 
   // 5. `session` now contains an authenticated Session instance.
   if (session.info.isLoggedIn) {
-    res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
+    // res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
+    res.redirect("http://localhost:3000/");
   }
   else{
-    res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
+    // res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
+    res.redirect("http://localhost:3000/");
   }
 });
 
