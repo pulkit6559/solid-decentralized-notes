@@ -51,13 +51,16 @@ class NoteForm extends Component {
     renderFormButtons() {
         if (this.props.note.id !== undefined) {
             return (<div>
+                {/* <button type="makePublic" className="btn btn-success float-right">Save Note (Public)</button> */}
                 <button type="submit" className="btn btn-success float-right">Save Note</button>
                 <button onClick={this.deleteNote} className="btn btn-danger">Delete Note</button>
             </div>);
         }
         return (
-
+            <div>
+            <button type="makePublic" className="btn btn-success float-left">Save Note (Public)</button>
             <button type="submit" className="btn btn-success float-right">Save Note</button>
+            </div>
         );
     }
 
