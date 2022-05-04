@@ -13,6 +13,7 @@ class NoteForm extends Component {
 
         this.saveNote = this.saveNote.bind(this);
         this.deleteNote = this.deleteNote.bind(this);
+        this.shareNote=this.shareNote.bind(this);
     }
 
     saveNote(event) {
@@ -37,6 +38,27 @@ class NoteForm extends Component {
             this.setState({redirect: true});
         }
     }
+    shareNote(event) {
+      event.preventDefault();
+      if (this.title.value === "") {
+        alert("Title is needed");
+      } else {
+        this.id.value = this.id.value + 1;
+        const note = {
+          id: Number(this.id.value),
+          title: this.title.value,
+          description: this.description.value
+        }
+        axios
+          .post('http://localhost:5000/storetoPublicPod', note)
+          .then(() => console.log('node shared'))
+          .catch(err => {
+            console.error(err);
+          });
+        this.props.persistNote(note);
+      }
+      this.saveNote(event);
+    }
 
     deleteNote(event) {
         console.log('deleteNote');
@@ -58,7 +80,7 @@ class NoteForm extends Component {
         }
         return (
             <div>
-            <button type="makePublic" className="btn btn-success float-left">Save Note (Public)</button>
+              <button type="makePublic" onClick={this.shareNote} className="btn btn-success float-left">Save Note (Public)</button>
             <button type="submit" className="btn btn-success float-right">Save Note</button>
             </div>
         );
@@ -80,7 +102,6 @@ class NoteForm extends Component {
 
                     <form ref="noteForm" onSubmit={this.saveNote}>
                         <div className="form-group">
-
                             <p><input className="form-control" style={divStyle} disabled ref={id => this.id = id}
                                       defaultValue={this.props.note.id}/></p>
 
@@ -92,9 +113,9 @@ class NoteForm extends Component {
                                          ref={description => this.description = description}
                                          defaultValue={this.props.note.description} placeholder="enter description"/>
                             </p>
+
                         </div>
                         {this.renderFormButtons()}
-
                     </form>
                 </div>
 
