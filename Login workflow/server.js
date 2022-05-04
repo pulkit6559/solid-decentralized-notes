@@ -189,7 +189,7 @@ app.post("/storetoPublicPod", async (req, res) => {
 });
 
 
-
+// this reads the content of the note
 app.get("/readNote", async (req, res) => {
   console.log("Here, I'm trying to read!");
   const notes_url = "https://pod.inrupt.com/pulkit6559/Notesdump/"
@@ -217,17 +217,6 @@ app.get("/readNote", async (req, res) => {
     
     const title = note_url.split("/").pop();
     console.log("Title of Note: " + title);
-    //console.log(small_profile)
-
-    //const small_profile_dataset = await getSolidDataset(
-     // small_profile[1]["predicates"],
-    //  {fetch: fetch}
-    //)
-
-    //const small_profile_thing = getThingAll(
-     // small_profile_dataset,
-      //small_profile[1]["predicates"]
-    //)
 
     const description = getStringWithLocale(small_profile, "https://pod.inrupt.com/pulkit6559/Notesdump/new_note_demo_1#new_note_demo");
     //"http://schema.org/description"
