@@ -1,3 +1,14 @@
+const {
+  getSolidDataset,
+  getThingAll,
+  getThing,
+  getUrl,
+  getStringNoLocale,
+  getStringWithLocale,
+  getStringByLocaleAll,
+  getUrlAll
+} = require("@inrupt/solid-client");
+
 const express = require('express');
 const cookieSession = require("cookie-session");
 
@@ -7,8 +18,6 @@ const {
   Session
 } = require("@inrupt/solid-client-authn-node");
 const{
-  getSolidDataset,
-  getThing,
   saveSolidDatasetAt,
   createThing,
   buildThing,
@@ -159,6 +168,54 @@ app.get("/readAllNotes", async (req, res) => {
   
 });
 
+
+
+app.get("/readNote", async (req, res) => {
+  console.log("Here, I'm trying to read!");
+  const notes_url = "https://pod.inrupt.com/pulkit6559/Notesdump/"
+  const myDataset = await getSolidDataset(
+      notes_url,
+      { fetch: fetch }          // fetch from authenticated session
+    );
+  const profile = getThingAll(
+      myDataset,
+      notes_url
+    );
+  
+  for(index = 1; index < profile.length; index ++){
+    const note_url = profile[index]['url'];
+
+    const small_dataset = await getSolidDataset(
+      note_url,
+      { fetch: fetch }
+    );
+    
+    const small_profile = getThing(
+      small_dataset,
+      note_url
+    )
+    
+    const title = note_url.split("/").pop();
+    console.log("Title of Note: " + title);
+    //console.log(small_profile)
+
+    //const small_profile_dataset = await getSolidDataset(
+     // small_profile[1]["predicates"],
+    //  {fetch: fetch}
+    //)
+
+    //const small_profile_thing = getThingAll(
+     // small_profile_dataset,
+      //small_profile[1]["predicates"]
+    //)
+
+    const description = getStringWithLocale(small_profile, "https://pod.inrupt.com/pulkit6559/Notesdump/new_note_demo_1#new_note_demo");
+    //"http://schema.org/description"
+    console.log("Description of Note: " + description)
+    console.log();
+  }
+  console.log("Done reading_3");
+});
 
 
 app.listen(port, function()
