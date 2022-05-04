@@ -204,22 +204,29 @@ app.get("/readNote", async (req, res) => {
   
   for(index = 1; index < profile.length; index ++){
     const note_url = profile[index]['url'];
-
+    const rdf_description = "http://schema.org/description"
     const small_dataset = await getSolidDataset(
-      note_url,
+      note_url ,
       { fetch: fetch }
     );
     
-    const small_profile = getThing(
+    const small_profile = getThingAll(
       small_dataset,
-      note_url
+      "http://schema.org/description"
     )
-    
-    const title = note_url.split("/").pop();
-    console.log("Title of Note: " + title);
 
-    const description = getStringWithLocale(small_profile, "https://pod.inrupt.com/pulkit6559/Notesdump/new_note_demo_1#new_note_demo");
-    //"http://schema.org/description"
+
+    //const smallest_dataset = await getSolidDataset(
+    //  note_url + "#" + note_url.split("/").pop() ,
+    //  { fetch: fetch }
+    //);
+
+    //const smallest_profile = getThingAll(small)
+    
+    console.log("Title of Note: " + note_url.split("/").pop());
+    //console.log(small_profile)
+    const description = getStringWithLocale(getThingAll(small_profile[1]["predicates"], "http://schema.org/description") ,"http://schema.org/description");
+    //"http://schema.org/description"  "https://pod.inrupt.com/pulkit6559/Notesdump/new_note_demo_1#new_note_demo"
     console.log("Description of Note: " + description)
     console.log();
   }
