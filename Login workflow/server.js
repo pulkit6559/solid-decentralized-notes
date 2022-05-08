@@ -190,8 +190,6 @@ app.post("/storetoPublicPod", async (req, res) => {
   );
 
 
-
-
   await access.setPublicAccess(
     "https://pod.inrupt.com/pulkit/Notesdump/" + req.body.title,
     { read: true, write:true, append:false },
@@ -200,6 +198,18 @@ app.post("/storetoPublicPod", async (req, res) => {
   
   console.log("Here! Done ")
   res.send(`store data to solidpublicpod`);
+});
+
+
+app.get("/giveAccessTo", async (req, res) => {
+  const session = app.locals.session;
+  await access.setAgentAccess(
+    "https://pod.inrupt.com/pulkit/Notesdump/" + 'test',
+    'https://pod.inrupt.com/leslie/profile/card#me',
+    { read: true, write:true, append:false },
+    { fetch: session.fetch },
+  );
+  res.send("Added access to file for leslie")
 });
 
 
