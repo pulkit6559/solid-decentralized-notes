@@ -22,7 +22,8 @@ const{
   createThing,
   buildThing,
   setThing,
-  createSolidDataset
+  createSolidDataset,
+  access
 }=require("@inrupt/solid-client");
 const{
   FOAF,
@@ -100,7 +101,7 @@ app.get("/afterLogin", async (req, res) => {
 
   // courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
   // const savedSolidDataset = await saveSolidDatasetAt(
-  //   "https://pod.inrupt.com/pulkit6559/public/newNote7",
+  //   "https://pod.inrupt.com/pulkit/public/newNote7",
   //   courseSolidDataset,
   //   { fetch: fetch }             // fetch from authenticated Session
   // );
@@ -133,7 +134,7 @@ app.post("/reactNote", async (req, res) => {
   // courseSolidDataset2 = setThing(courseSolidDataset2, newTextThing2);
 
   const savedSolidDataset = await saveSolidDatasetAt(
-    "https://pod.inrupt.com/pulkit6559/Notesdump/" + req.body.title + "_" +req.body.id,
+    "https://pod.inrupt.com/pulkit/Notesdump/" + req.body.title,
     courseSolidDataset,
     { fetch: fetch }             // fetch from authenticated Session
   );
@@ -144,9 +145,9 @@ app.post("/reactNote", async (req, res) => {
 
 app.get("/readAllNotes", async (req, res) => {
 
-  const notes_url = "https://pod.inrupt.com/pulkit6559/Notesdump/";
+  const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/";
   const myDataset = await getSolidDataset(
-    "https://pod.inrupt.com/pulkit6559/Notesdump/",
+    "https://pod.inrupt.com/pulkit/Notesdump/",
     { fetch: fetch }          // fetch from authenticated session
   );
 
@@ -156,7 +157,7 @@ app.get("/readAllNotes", async (req, res) => {
   notesFolder = myDataset.graphs.default
 
   for (const entry of Object.entries(notesFolder)) {
-    if (entry[0]=="https://pod.inrupt.com/pulkit6559/Notesdump/"){
+    if (entry[0]=="https://pod.inrupt.com/pulkit/Notesdump/"){
       console.log("USELESS");
     }
     else{
@@ -172,7 +173,7 @@ app.post("/storetoPublicPod", async (req, res) => {
   let courseSolidDataset = createSolidDataset();
   //req tansfer the name of the file and its id. the prefix should be decided accourding to different user
   const newBookThing1 = buildThing(createThing({ name: req.body.title }))
-    .addStringNoLocale(SCHEMA_INRUPT.text, "https://pod.inrupt.com/pulkit6559/Notesdump/" + req.body.title + "_" +req.body.id)
+    .addStringNoLocale(SCHEMA_INRUPT.text, "https://pod.inrupt.com/pulkit/Notesdump/" + req.body.title)
     .build();
 
 
@@ -184,6 +185,16 @@ app.post("/storetoPublicPod", async (req, res) => {
     courseSolidDataset,
     { fetch: fetch }             // fetch from authenticated Session
   );
+
+
+  const session = await getSessionFromStorage(req.session.sessionId);
+
+  await access.setPublicAccess(
+    "https://pod.inrupt.com/pulkit/Notesdump/" + req.body.title,
+    { read: true, write:true, append:false },
+    { fetch: session.fetch },
+  );
+  
   console.log("Here! Done ")
   res.send(`store data to solidpublicpod`);
 });
@@ -192,7 +203,7 @@ app.post("/storetoPublicPod", async (req, res) => {
 // this reads the content of the note
 app.get("/readNote", async (req, res) => {
   console.log("Here, I'm trying to read!");
-  const notes_url = "https://pod.inrupt.com/pulkit6559/Notesdump/"
+  const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
   const myDataset = await getSolidDataset(
       notes_url,
       { fetch: fetch }          // fetch from authenticated session
@@ -226,7 +237,7 @@ app.get("/readNote", async (req, res) => {
     console.log("Title of Note: " + note_url.split("/").pop());
     //console.log(small_profile)
     const description = getStringWithLocale(getThingAll(small_profile[1]["predicates"], "http://schema.org/description") ,"http://schema.org/description");
-    //"http://schema.org/description"  "https://pod.inrupt.com/pulkit6559/Notesdump/new_note_demo_1#new_note_demo"
+    //"http://schema.org/description"  "https://pod.inrupt.com/pulkit/Notesdump/new_note_demo_1#new_note_demo"
     console.log("Description of Note: " + description)
     console.log();
   }
