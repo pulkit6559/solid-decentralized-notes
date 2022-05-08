@@ -91,12 +91,13 @@ app.get("/afterLogin", async (req, res) => {
   //    it means that the login has been initiated and can be completed. In
   //    particular, initiating the login stores the session in storage,
   //    which means it can be retrieved as follows.
-  const session = await getSessionFromStorage(req.session.sessionId);
 
   // 4. With your session back from storage, you are now able to
   //    complete the login process using the data appended to it as query
   //    parameters in req.url by the Solid Identity Provider:
-  // await session.handleIncomingRedirect(`http://localhost:${port}${req.url}`);
+  const session = await getSessionFromStorage(req.session.sessionId);
+  await session.handleIncomingRedirect(`http://localhost:${port}${req.url}`);
+  app.locals.session = session;
 
 
   // courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
@@ -114,12 +115,13 @@ app.get("/afterLogin", async (req, res) => {
   }
   else{
     // res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
-    res.redirect("http://localhost:3000/");
+    res.redirect("SESSION AUTH FAILED");
   }
 });
 
 app.post("/reactNote", async (req, res) => {
   console.log("Here!")
+  const session = app.locals.session;
   console.log(req.body)
   let courseSolidDataset = createSolidDataset();
   const newBookThing1 = buildThing(createThing({ name: req.body.title }))
@@ -136,7 +138,7 @@ app.post("/reactNote", async (req, res) => {
   const savedSolidDataset = await saveSolidDatasetAt(
     "https://pod.inrupt.com/pulkit/Notesdump/" + req.body.title,
     courseSolidDataset,
-    { fetch: fetch }             // fetch from authenticated Session
+    { fetch: session.fetch }             // fetch from authenticated Session
   );
   console.log("Here! Done writing")
   res.send(`sent data to pod`);
@@ -170,6 +172,7 @@ app.get("/readAllNotes", async (req, res) => {
 });
 
 app.post("/storetoPublicPod", async (req, res) => {
+  const session = app.locals.session;
   let courseSolidDataset = createSolidDataset();
   //req tansfer the name of the file and its id. the prefix should be decided accourding to different user
   const newBookThing1 = buildThing(createThing({ name: req.body.title }))
@@ -183,11 +186,11 @@ app.post("/storetoPublicPod", async (req, res) => {
   const savedSolidDataset = await saveSolidDatasetAt(
     "https://pod.inrupt.com/leslie/publicSolidPodFile/" + req.body.title,
     courseSolidDataset,
-    { fetch: fetch }             // fetch from authenticated Session
+    { fetch: session.fetch }             // fetch from authenticated Session
   );
 
 
-  const session = await getSessionFromStorage(req.session.sessionId);
+
 
   await access.setPublicAccess(
     "https://pod.inrupt.com/pulkit/Notesdump/" + req.body.title,
