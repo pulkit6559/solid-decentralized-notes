@@ -1,24 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import NotesApp from './NotesApp';
 import registerServiceWorker from './registerServiceWorker';
-import { BrowserRouter, Route } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.css';
+import App from './App';
 
 
 ReactDOM.render((
     <div>
-        <div className="container-fluid bg-dark">
-            <h1 className="text-center display-1 text-white">Notes App</h1>
-            <hr/>
-        </div>
-        <p></p>
-        <div className="container-fluid">
-            <BrowserRouter>
-                <Route path="/" component={NotesApp}/>
-            </BrowserRouter>
-        </div>
-    </div>
+    <BrowserRouter>
+    <App />
+  </BrowserRouter>
+  </div>
 ), document.getElementById('root'));
 
 registerServiceWorker();
