@@ -216,44 +216,46 @@ app.get("/giveAccessTo", async (req, res) => {
 // this reads the content of the note
 app.get("/readNote", async (req, res) => {
   console.log("Here, I'm trying to read!");
+  const session = app.locals.session;
   const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
   const myDataset = await getSolidDataset(
       notes_url,
-      { fetch: fetch }          // fetch from authenticated session
-    );
-  const profile = getThingAll(
-      myDataset,
-      notes_url
+      { fetch: session.fetch }          // fetch from authenticated session
     );
   
-  for(index = 1; index < profile.length; index ++){
-    const note_url = profile[index]['url'];
-    const rdf_description = "http://schema.org/description"
-    const small_dataset = await getSolidDataset(
-      note_url ,
-      { fetch: fetch }
-    );
-    
-    const small_profile = getThingAll(
-      small_dataset,
-      "http://schema.org/description"
-    )
 
+  let def = myDataset['graphs']['default'];
 
-    //const smallest_dataset = await getSolidDataset(
-    //  note_url + "#" + note_url.split("/").pop() ,
-    //  { fetch: fetch }
-    //);
+  let result = {};
 
-    //const smallest_profile = getThingAll(small)
-    
-    console.log("Title of Note: " + note_url.split("/").pop());
-    //console.log(small_profile)
-    const description = getStringWithLocale(getThingAll(small_profile[1]["predicates"], "http://schema.org/description") ,"http://schema.org/description");
-    //"http://schema.org/description"  "https://pod.inrupt.com/pulkit/Notesdump/new_note_demo_1#new_note_demo"
-    console.log("Description of Note: " + description)
-    console.log();
+  for (var key in def) {
+    if (key=="https://pod.inrupt.com/pulkit/Notesdump/"){
+      console.log("Skip");
+    }
+    else{
+      console.log(key);
+      let dataset = await getSolidDataset(
+        key,
+        { fetch: session.fetch }          // fetch from authenticated session
+      );
+      let arr_ = key.split("/");
+      let thingName = arr_[arr_.length-1];
+      thingName = key+"#"+thingName;
+      console.log("THING: ", thingName);
+      let profile = getThing(
+        dataset,
+        thingName
+      );
+      // console.log(profile);
+      const fn = getStringNoLocale(profile, SCHEMA_INRUPT.description);
+      console.log(fn);
+      result[key] = profile;
+      // res.send(dataset);
+    }
+
   }
+
+  res.send(result);
   console.log("Done reading_3");
 });
 
