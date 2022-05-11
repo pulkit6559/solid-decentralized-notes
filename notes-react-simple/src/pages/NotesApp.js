@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import moment from 'moment';
-import NoteForm from './NoteForm';
-import NoteView from './NoteView';
-import NotesListMenu from './NotesListMenu';
+import NoteForm from '../components/NoteForm';
+import NoteView from '../components/NoteView';
+import NotesListMenu from '../components/NotesListMenu';
 import {
     Route,
     Link
@@ -115,11 +115,11 @@ class NotesApp extends Component {
     renderHeader() {
         return (
             <div className="card-header">
-                <Route exact path="/note"
-                       render={routeProps => <Link to="/"><button type="button" className="btn btn-danger">Close Add Note Form</button></Link>}/>
-                {["/", "/note/:id"].map(path =>
+                <Route exact path="/notes/note"
+                       render={routeProps => <Link to="/notes"><button type="button" className="btn btn-danger">Close Add Note Form</button></Link>}/>
+                {["/notes", "/notes/note/:id"].map(path =>
                         <Route key={path} exact path={path}
-                               render={routeProps => <Link to="/note"><button type="button" className="btn btn-success">Add Note</button></Link>}/>
+                               render={routeProps => <Link to="/notes/note"><button type="button" className="btn btn-success">Add Note</button></Link>}/>
                 )}
             </div>
         )
@@ -129,15 +129,15 @@ class NotesApp extends Component {
         const editMode = this.state.editMode;
         return (<div>
             {editMode ? (
-                <Route exact path="/note/:id"
+                <Route exact path="/notes/note/:id"
                        render={routeProps =>  <NoteForm persistNote={this.saveEditedNote} deleteNote={this.deleteNote} note={this.state.selectedNote}/>}
                     />
             ) : (
-                <Route exact path="/note/:id"
+                <Route exact path="/notes/note/:id"
                        render={routeProps =>  <NoteView editNote={this.openEditNote} deleteNote={this.deleteNote} note={this.state.selectedNote}/>}
                     />
             )}
-            <Route exact path="/note"
+            <Route exact path="/notes/note"
                    render={routeProps =>  <NoteForm persistNote={this.addNote} note={this.getEmptyNote()}/>}
                 />
         </div>)
