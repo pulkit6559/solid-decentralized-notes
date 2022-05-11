@@ -1,50 +1,7 @@
 # Team1
 
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://git-ce.rwth-aachen.de/lab-sovereign-data-exchange-2022/team1.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://git-ce.rwth-aachen.de/lab-sovereign-data-exchange-2022/team1/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-
 ## Name
-Solid Model Project: Sovereign Data Exchange Lab 2022 (Team 1)
+Solid Model Project: Sovereign Data Exchange Lab 2022 
 
 ## Description
 This repository contains the Solid Model Project in the Sovereign Data Exchange Lab Course of the SS2022 at the RWTH Aachen. 
@@ -67,7 +24,12 @@ Here are all methods that work within the Solid framework and are the basis of t
 
 
 ## Requirements
-XXX              
+A decentralized data exchange application should contain the following functionalities:
+It provides an interface that allows fetching user data from a decentralized data store. It allows sharing and modifications in one of the following scenarios
+1. Within application b/w diff user’s pods: User X can be allowed to view User Y’s info when given the appropriate permissions
+2. Public sharing: A user can decide to make the data available for public usage
+3. With other data applications: eg, a blog stored in a users pod as a social media posts
+             
 
 ## Installation
 XXX
@@ -76,7 +38,25 @@ XXX
 XXX
 
 ## Current Use Case Scenario
-To be filled.
+Motivation: Allow users to make notes collaboratively
+What can our system do:
+1. Allows a user to create a note
+2. Allow a user to share his notes with another user (read/edit privileges)
+3. Public sharing of notes
+4. (*) Associate notes with tags, eg (private and public) and also with specific tags (Mathematics, physics, screenplay) 
+5. (*) Functionality for users to give edit suggestions to public “read-only” notes
+6. (*) Link ideas -> create a knowledge graph (a sentence/phrase in note X can be linked-to note Y) 
+(*) Tentative functionalities, not to be included in the POC. Included in a complex data exchange scenario
+
+
+## Already Accomplished
+- Adding access only to certain users with the WebId. 
+- Adding friend UI
+- working on making public shared note to be private
+- readme
+- readfile
+- policy framework
+
 
 ## Roadmap
 Currently working on fixing open issues: 
@@ -85,6 +65,13 @@ Currently working on fixing open issues:
 - Writing/Maintaining README.md
 - Frontend, list all notes created by the user
 Soon the use case will be implemented and used on the create Solid model
+
+## Current Issues
+- SaveFileInContainer: “append” access
+
+## To-dos
+- Implementing the policies for the public deletion of note
+- Implementing the policies for User-User sharing
 
 
 
