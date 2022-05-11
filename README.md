@@ -35,7 +35,17 @@ It provides an interface that allows fetching user data from a decentralized dat
 XXX
 
 ## Running Code
-XXX
+1. Running the server
+* cd "Login Workflow"
+* npm install
+* npm start
+
+2. Running the Frontend
+* cd notes-react-simple
+* npm install
+* npm start
+
+Once both are running go to `localhost:5000` to access the application
 
 ## Current Use Case Scenario
 Motivation: Allow users to make notes collaboratively
