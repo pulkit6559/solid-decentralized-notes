@@ -36,18 +36,18 @@ In order to run the code an installment of Node.js as well as npm is needed. Nod
 
 ## Running Code
 1. Running the server
-'''
+```
 cd "Login Workflow"
 npm install
 npm start
-'''
+```
 
 2. Running the Frontend
-'''
+```
 cd notes-react-simple
 npm install
 npm start
-'''
+```
 
 Once both are running go to `localhost:5000` to access the application
 
