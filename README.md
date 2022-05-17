@@ -32,7 +32,7 @@ It provides an interface that allows fetching user data from a decentralized dat
              
 
 ## Installation
-XXX
+In order to run the code an installment of Node.js as well as npm is needed. Node.js can be downloaded [here](https://nodejs.org/en/download/). Further instructions on how to install Node.js as well as npm is explained on [this website.](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 
 ## Running Code
 1. Running the server
