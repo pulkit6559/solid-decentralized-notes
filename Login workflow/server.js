@@ -213,6 +213,26 @@ app.get("/giveAccessTo", async (req, res) => {
 });
 
 
+app.get("/shareWithWebID", async (req, res) => {
+  const session = app.locals.session;
+
+  // set access of the note 'test' as 'write' for leslie's webID
+  await access.setAgentAccess(
+    "https://pod.inrupt.com/pulkit/Notesdump/" + 'test',
+    'https://pod.inrupt.com/leslie/profile/card#me',
+    { read: true, write:true, append:false },
+    { fetch: session.fetch },
+  );
+
+  //  create thing object AppPod/Leslie/author_test_ref with URL of note
+
+
+  // set access of AppPod/Leslie/author_test_ref as 'read' for leslie and 'write' for  pulkit
+
+  res.send("Added access to file for leslie")
+});
+
+
 // this reads the content of the note
 app.get("/readNote", async (req, res) => {
   console.log("Here, I'm trying to read!");
