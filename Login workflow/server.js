@@ -216,18 +216,31 @@ app.get("/giveAccessTo", async (req, res) => {
 app.get("/shareWithWebID", async (req, res) => {
   const session = app.locals.session;
 
-  // set access of the note 'test' as 'write' for leslie's webID
+  // ************** this call should be moved to frontend *****************
+  // set access of the note 'test' as 'write' for leslie's webID (need user's session)
   await access.setAgentAccess(
     "https://pod.inrupt.com/pulkit/Notesdump/" + 'test',
     'https://pod.inrupt.com/leslie/profile/card#me',
     { read: true, write:true, append:false },
     { fetch: session.fetch },
   );
+  
 
+  // ********* the URL of note should be provided in the request of this endpoint *********
   //  create thing object AppPod/Leslie/author_test_ref with URL of note
+  const newBookThing1 = buildThing(createThing({ name: "pulkit_test_ref" }))
+  .addStringNoLocale(SCHEMA_INRUPT.text, "https://pod.inrupt.com/pulkit/Notesdump/" + "test")
+  .build();
+  courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
+  const savedSolidDataset = await saveSolidDatasetAt(
+    "https://pod.inrupt.com/leslie/Users/" + "leslie/" + "pulkit_test_ref",
+    courseSolidDataset,
+    { fetch: session.fetch }             // fetch from authenticated Session
+  );
 
-
-  // set access of AppPod/Leslie/author_test_ref as 'read' for leslie and 'write' for  pulkit
+  // ****************** need AppPod's session here ********************
+  // set access of AppPod/Users/Leslie/author_test_ref as 'read' 
+  // for leslie and 'write' for  pulkit (need AppPod's session)
 
   res.send("Added access to file for leslie")
 });
