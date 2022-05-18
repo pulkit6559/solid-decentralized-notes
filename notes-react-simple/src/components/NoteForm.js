@@ -25,6 +25,7 @@ class NoteForm extends Component {
             const note = {
                 id: Number(this.id.value),
                 title: this.title.value,
+                userWebId: this.userWebId.value,
                 description: this.description.value
             }
             axios
@@ -108,6 +109,9 @@ class NoteForm extends Component {
                             <p><input className="form-control" ref={title => this.title = title}
                                       defaultValue={this.props.note.title}
                                       placeholder="enter title"/></p>
+                            <p><input className="form-control" ref={userWebId => this.userWebId = userWebId}
+                                defaultValue={this.props.note.userWebId}
+                                placeholder="enter user WebId"/></p>
 
                             <p><textarea className="form-control" rows="10"
                                          ref={description => this.description = description}
