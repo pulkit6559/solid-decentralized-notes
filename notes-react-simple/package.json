@@ -3,6 +3,8 @@
   "version": "0.1.1",
   "private": true,
   "dependencies": {
+    "@inrupt/solid-client": "^1.23.0",
+    "@inrupt/solid-client-authn-browser": "^1.11.9",
     "axios": "^0.27.2",
     "bootstrap": "4.6.0",
     "moment": "2.29.1",
