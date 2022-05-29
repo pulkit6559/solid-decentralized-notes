@@ -9,6 +9,9 @@ const {
   getUrlAll
 } = require("@inrupt/solid-client");
 
+var PropertiesReader = require('properties-reader');
+var properties = PropertiesReader('config/app.properties');
+
 const express = require('express');
 const cookieSession = require("cookie-session");
 
@@ -75,7 +78,7 @@ app.get('/', async function(req, res)
     // After login, the Solid Identity Provider will send the user back to the following
     // URL, with the data necessary to complete the authentication process
     // appended as query parameters:
-    redirectUrl: `http://localhost:${5000}/afterLogin`,
+    redirectUrl: `http://localhost:${properties.get("port")}/afterLogin`,
     // Set to the user's Solid Identity Provider; e.g., "https://broker.pod.inrupt.com"
     oidcIssuer: "https://broker.pod.inrupt.com",
     // Pick an application name that will be shown when asked
@@ -85,7 +88,7 @@ app.get('/', async function(req, res)
   });
 
 });
-var port = process.env.PORT || 5000;
+var port = process.env.PORT || properties.get("port");
 app.get("/afterLogin", async (req, res) => {
   // 3. If the user is sent back to the `redirectUrl` provided in step 2,
   //    it means that the login has been initiated and can be completed. In
