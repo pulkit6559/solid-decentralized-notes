@@ -9,30 +9,94 @@ import {
     Link
 } from 'react-router-dom';
 
+const {
+    getSolidDataset,
+    getThingAll,
+    getThing,
+    getUrl,
+    getStringNoLocale,
+    getStringWithLocale,
+    getStringByLocaleAll,
+    getUrlAll
+  } = require("@inrupt/solid-client");
+
+const{
+FOAF,
+VCARD,
+RDF,
+SCHEMA_INRUPT
+}=require("@inrupt/vocab-common-rdf");
+
+import {getDefaultSession, Session, getSessionFromStorage } from '@inrupt/solid-client-authn-browser'
+
+
 async function format_request() {
-    const res = await axios.get('http://localhost:5000/readNote');
-    console.log(res);
+    // const res = await axios.get('http://localhost:5000/readNote');
+    
+    let session = getDefaultSession();
+    const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
+    const myDataset = await getSolidDataset(
+        notes_url,
+        { fetch: session.fetch }          // fetch from authenticated session
+    );
 
+
+    let def = myDataset['graphs']['default'];
+
+    let result = {};
+    let name_description = {}
+
+    for (var key in def) {
+        if (key=="https://pod.inrupt.com/pulkit/Notesdump/"){
+            console.log("Skip");
+        }
+        else{
+            console.log(key);
+            let dataset = await getSolidDataset(
+            key,
+            { fetch: session.fetch }          // fetch from authenticated session
+            );
+            let arr_ = key.split("/");
+            let Name = arr_[arr_.length-1];
+            let thingName = key+"#"+Name;
+            console.log("THING: ", thingName);
+            try {
+            let profile = getThing(
+                dataset,
+                thingName
+            );
+            // console.log(profile);
+            let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
+            // let name = getStringNoLocale(profile, SCHEMA_INRUPT.name)
+            console.log("****** ", Name, " ", description);
+            result[key] = profile;
+            name_description[Name] = description;
+            }
+            catch (e){
+            console.log(e)
+            continue;
+            }
+        }
+    }
+    console.log("$$$$$$$$$$$$$$$$$$$: ", name_description);
+    
+    let res = name_description;
     let all_notes = []
-
     let id = 1;
-    for (var title in res.data){
-        // console.log(res.data.title)
+
+    for (var title in res){
         all_notes.push(
             {
                 'id':id,
                 'title':title,
-                'description': res.data[title],
+                'description': res[title],
                 'date': "2022-05-30T09:33:56.543Z"
             }
         )
         id = id + 1;
-        
     }
     return all_notes
-
 }
-
 
 class NotesApp extends Component {
     constructor(props) {
