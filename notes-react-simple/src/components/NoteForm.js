@@ -29,7 +29,7 @@ class NoteForm extends Component {
                 description: this.description.value
             }
             axios
-            .post('http://localhost:5000/reactNote', note)
+            .post('http://localhost:4444/reactNote', note)
             .then(() => console.log('Book Created'))
             .catch(err => {
               console.error(err);
@@ -51,7 +51,7 @@ class NoteForm extends Component {
           description: this.description.value
         }
         axios
-          .post('http://localhost:5000/storetoPublicPod', note)
+          .post('http://localhost:4444/storetoPublicPod', note)
           .then(() => console.log('node shared'))
           .catch(err => {
             console.error(err);
