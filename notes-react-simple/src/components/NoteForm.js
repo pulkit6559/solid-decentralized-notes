@@ -75,14 +75,14 @@ class NoteForm extends Component {
         if (this.props.note.id !== undefined) {
             return (<div>
                 {/* <button type="makePublic" className="btn btn-success float-right">Save Note (Public)</button> */}
-                <button type="submit" className="btn btn-success float-right">Save Note</button>
+                <button type="submit" onClick={this.saveNote} className="btn btn-success float-right">Save Note</button>
                 <button onClick={this.deleteNote} className="btn btn-danger">Delete Note</button>
             </div>);
         }
         return (
             <div>
               <button type="makePublic" onClick={this.shareNote} className="btn btn-success float-left">Save Note (Public)</button>
-            <button type="submit" className="btn btn-success float-right">Save Note</button>
+            <button type="submit" onClick={this.saveNote} className="btn btn-success float-right">Save Note</button>
             </div>
         );
     }
@@ -90,9 +90,11 @@ class NoteForm extends Component {
     render() {
         if (this.state.redirect) {
             if (!this.props.note) {
-                return <Redirect push to="/notes/"/>;
+                return <Redirect exact to="/notes/"/>;
             }
-            return <Redirect push to={`/note/${this.props.note.id}`}/>;
+            
+            return <Redirect to={`/home`}/>;
+            
             // return <Redirect push to={`/notes/`}/>;
         }
         return (
