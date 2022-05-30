@@ -1,5 +1,20 @@
 import React, {Component} from 'react';
 import { Redirect } from 'react-router';
+import {getDefaultSession} from '@inrupt/solid-client-authn-browser'
+
+const{
+    saveSolidDatasetAt,
+    createThing,
+    buildThing,
+    setThing,
+    createSolidDataset
+}=require("@inrupt/solid-client");
+
+const{
+    RDF,
+    SCHEMA_INRUPT
+}=require("@inrupt/vocab-common-rdf");
+
 var axios = require('axios')
 
 const divStyle = {
@@ -16,6 +31,28 @@ class NoteForm extends Component {
         this.shareNote=this.shareNote.bind(this);
     }
 
+    async addNote(note){
+        let session = getDefaultSession();
+        const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
+        let courseSolidDataset = createSolidDataset();
+
+        const newBookThing1 = buildThing(createThing({ name: note.title }))
+            .addStringNoLocale(SCHEMA_INRUPT.name, "react generated note")
+            .addStringNoLocale(SCHEMA_INRUPT.description, note.description)
+            .addStringNoLocale(SCHEMA_INRUPT.text, note.description)
+            .addUrl(RDF.type, "https://schema.org/TextDigitalDocument")
+            .build();
+
+        courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
+
+        const savedSolidDataset = await saveSolidDatasetAt(
+            "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
+            courseSolidDataset,
+            { fetch: session.fetch }             // fetch from authenticated Session
+        );
+
+    }
+
     saveNote(event) {
         event.preventDefault();
         if (this.title.value === "") {
@@ -28,12 +65,18 @@ class NoteForm extends Component {
                 userWebId: this.userWebId.value,
                 description: this.description.value
             }
-            axios
-            .post('http://localhost:4444/reactNote', note)
-            .then(() => console.log('Book Created'))
-            .catch(err => {
-              console.error(err);
+
+            this.addNote(note).then(ret=>{
+
+            }).catch(e => {
+                console.log(e);
             });
+            // axios
+            // .post('http://localhost:4444/reactNote', note)
+            // .then(() => console.log('Book Created'))
+            // .catch(err => {
+            //   console.error(err);
+            // });
 
             this.props.persistNote(note);
             this.setState({redirect: true});

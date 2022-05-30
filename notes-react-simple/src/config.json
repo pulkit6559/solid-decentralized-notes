@@ -1,4 +1,4 @@
 {
-    "SERVER_PORT":1234,
+    "SERVER_PORT":4444,
     "APP_PORT":3000
 }
