@@ -4,6 +4,7 @@ import {getDefaultSession} from '@inrupt/solid-client-authn-browser'
 
 const{
     saveSolidDatasetAt,
+    deleteSolidDataset,
     createThing,
     buildThing,
     setThing,
@@ -104,9 +105,25 @@ class NoteForm extends Component {
       this.saveNote(event);
     }
 
+    async deleteNote(note){
+        console.log("delte note ", note.title);
+        let session = getDefaultSession();
+        const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
+
+        const savedSolidDataset = await deleteSolidDataset(
+            "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
+            { fetch: session.fetch }             // fetch from authenticated Session
+        );
+    }
+
     deleteNote(event) {
         console.log('deleteNote');
         event.preventDefault();
+        this.deleteNote(this.props.note).then(ret=>{
+
+        }).catch(e => {
+            console.log(e);
+        });
         this.props.deleteNote(this.props.note.id);
     }
 
