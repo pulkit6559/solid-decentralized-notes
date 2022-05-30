@@ -30,8 +30,16 @@ class NoteView extends Component {
 
     render() {
         if (this.state.redirect || !this.props.note) {
-            return <Redirect push to="/"/>;
+            return <Redirect push to="/notes"/>;
         }
+
+        // if (this.state.redirect) {
+        //     if (!this.props.note) {
+        //         return <Redirect push to="/notes/"/>;
+        //     }
+        //     return <Redirect push to={`/note/${this.props.note.id}`}/>;
+        //     // return <Redirect push to={`/notes/`}/>;
+        // }
 
         return (
             <div className="card">
