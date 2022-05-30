@@ -14,7 +14,7 @@ class NotesListMenu extends Component {
         }
 
         const listItems = this.props.notes.map((note) =>
-                <NavLink activeClassName='active' to={`/note/${note.id}`}
+                <NavLink activeClassName='active' to={`notes/note/${note.id}`}
                       className="list-group-item"
                       key={note.id.toString()}
                       onClick={this.props.viewNote.bind(this, note.id)}>

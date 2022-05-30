@@ -3,18 +3,54 @@ import moment from 'moment';
 import NoteForm from '../components/NoteForm';
 import NoteView from '../components/NoteView';
 import NotesListMenu from '../components/NotesListMenu';
+var axios = require('axios')
 import {
     Route,
     Link
 } from 'react-router-dom';
 
+async function format_request() {
+    const res = await axios.get('http://localhost:5000/readNote');
+    console.log(res);
+
+    let all_notes = []
+
+    let id = 1;
+    for (var title in res.data){
+        // console.log(res.data.title)
+        all_notes.push(
+            {
+                'id':id,
+                'title':title,
+                'description': res.data[title],
+                'date': "2022-05-30T09:33:56.543Z"
+            }
+        )
+        id = id + 1;
+        
+    }
+    return all_notes
+
+}
 
 
 class NotesApp extends Component {
     constructor(props) {
         super(props);
 
-        const notes = localStorage.getItem('notes') ? JSON.parse(localStorage.getItem('notes')) : [];
+        let all_notes = [];
+        
+        format_request().then(ret => {
+            all_notes = ret;
+            console.log("Type of : localstorage",JSON.parse(localStorage.getItem('notes')));
+            console.log("Type of : all_notes", all_notes);
+            this.setState({notes: all_notes})
+        }).catch(e => {
+            console.log(e);
+        });
+        
+        // let notes = localStorage.getItem('notes') ? JSON.parse(localStorage.getItem('notes')) : [];
+        let notes = all_notes;
         console.log(notes);
         this.state = {
             notes: notes,
@@ -35,7 +71,7 @@ class NotesApp extends Component {
     }
 
     persistNotes(notes) {
-        localStorage.setItem('notes', JSON.stringify(notes));
+        // localStorage.setItem('notes', JSON.stringify(notes));
         this.setState({notes: notes});
     }
 
@@ -131,11 +167,11 @@ class NotesApp extends Component {
         const editMode = this.state.editMode;
         return (<div>
             {editMode ? (
-                <Route exact path="/notes/note/:id"
+                <Route  path="/notes/note/:id"
                        render={routeProps =>  <NoteForm persistNote={this.saveEditedNote} deleteNote={this.deleteNote} note={this.state.selectedNote}/>}
                     />
             ) : (
-                <Route exact path="/notes/note/:id"
+                <Route path="/notes/note/:id"
                        render={routeProps =>  <NoteView editNote={this.openEditNote} deleteNote={this.deleteNote} note={this.state.selectedNote}/>}
                     />
             )}

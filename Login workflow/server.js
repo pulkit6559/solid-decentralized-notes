@@ -263,6 +263,7 @@ app.get("/readNote", async (req, res) => {
   let def = myDataset['graphs']['default'];
 
   let result = {};
+  name_description = {}
 
   for (var key in def) {
     if (key=="https://pod.inrupt.com/pulkit/Notesdump/"){
@@ -275,23 +276,31 @@ app.get("/readNote", async (req, res) => {
         { fetch: session.fetch }          // fetch from authenticated session
       );
       let arr_ = key.split("/");
-      let thingName = arr_[arr_.length-1];
-      thingName = key+"#"+thingName;
+      let Name = arr_[arr_.length-1];
+      thingName = key+"#"+Name;
       console.log("THING: ", thingName);
-      let profile = getThing(
-        dataset,
-        thingName
-      );
-      // console.log(profile);
-      const fn = getStringNoLocale(profile, SCHEMA_INRUPT.description);
-      console.log(fn);
-      result[key] = profile;
+      try {
+        let profile = getThing(
+          dataset,
+          thingName
+        );
+        // console.log(profile);
+        let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
+        // let name = getStringNoLocale(profile, SCHEMA_INRUPT.name)
+        console.log("****** ", Name, " ", description);
+        result[key] = profile;
+        name_description[Name] = description;
+      }
+      catch (e){
+        continue;
+      }
+
       // res.send(dataset);
     }
 
   }
 
-  res.send(result);
+  res.send(name_description);
   console.log("Done reading_3");
 });
 
@@ -300,3 +309,4 @@ app.listen(port, function()
 {
   console.log("Listening on " + port);
 });
+
