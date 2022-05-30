@@ -8,12 +8,14 @@ import {
     Link
 } from 'react-router-dom';
 
+
+
 class NotesApp extends Component {
     constructor(props) {
         super(props);
 
         const notes = localStorage.getItem('notes') ? JSON.parse(localStorage.getItem('notes')) : [];
-
+        console.log(notes);
         this.state = {
             notes: notes,
             selectedNote: null,
