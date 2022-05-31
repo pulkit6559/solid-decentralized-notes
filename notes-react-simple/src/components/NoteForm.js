@@ -55,6 +55,34 @@ class NoteForm extends Component {
 
     }
 
+    async shareWithFriend(note, friendWebID){
+        let session = getDefaultSession();
+        await access.setAgentAccess(
+            "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
+            friendWebID,
+            { read: true, write:false, append:false },
+            { fetch: session.fetch },
+        );
+
+        let req_data = {
+            user_card: "https://pod.inrupt.com/pulkit/profile/card#me",
+            user_name: "pulkit",
+            friend_card: "https://pod.inrupt.com/leslie/profile/card#me",
+            friend_name: "leslie",
+            noteURL:  "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
+            title: note.title
+        }
+
+        axios
+          .post('http://localhost:4444/shareWithWebID', req_data)
+          .then(() => console.log('note shared'))
+          .catch(err => {
+            console.error(err);
+          });
+
+
+    }
+
     saveNote(event) {
         event.preventDefault();
         if (this.title.value === "") {
@@ -69,10 +97,20 @@ class NoteForm extends Component {
             }
 
             this.addNote(note).then(ret=>{
-
+                if (!(note.userWebId === "")){
+                    console.log("SHARING WITH USER")
+                    this.shareWithFriend(note, "https://pod.inrupt.com/leslie/profile/card#me").then(ret=>{
+    
+                    }).catch(e => {
+                        console.log(e);
+                    });
+    
+                }
             }).catch(e => {
                 console.log(e);
             });
+
+           
             // axios
             // .post('http://localhost:4444/reactNote', note)
             // .then(() => console.log('Book Created'))
