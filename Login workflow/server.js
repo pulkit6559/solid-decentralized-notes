@@ -113,8 +113,8 @@ app.get("/afterLogin", async (req, res) => {
 
   // 5. `session` now contains an authenticated Session instance.
   if (session.info.isLoggedIn) {
-    // res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
-    res.redirect("http://localhost:3000/");
+    res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
+    // res.redirect("http://localhost:3000/");
   }
   else{
     // res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
@@ -182,7 +182,6 @@ app.post("/storetoPublicPod", async (req, res) => {
     .addStringNoLocale(SCHEMA_INRUPT.text, "https://pod.inrupt.com/pulkit/Notesdump/" + req.body.title)
     .build();
 
-
   courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
   // courseSolidDataset2 = setThing(courseSolidDataset2, newTextThing2);
 
@@ -193,9 +192,19 @@ app.post("/storetoPublicPod", async (req, res) => {
   );
 
 
+  // add read access to everyone
   await access.setPublicAccess(
-    "https://pod.inrupt.com/pulkit/Notesdump/" + req.body.title,
+    "https://pod.inrupt.com/leslie/publicSolidPodFile/" + req.body.title,
+    { read: true, write:false, append:false },
+    { fetch: session.fetch },
+  );
+
+  // add write access to note owner
+  await access.setAccessFor(
+    "https://pod.inrupt.com/leslie/publicSolidPodFile/" + req.body.title,
+    "agent",
     { read: true, write:true, append:false },
+    req.body.user_card,
     { fetch: session.fetch },
   );
   

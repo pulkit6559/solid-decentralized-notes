@@ -8,7 +8,8 @@ const{
     createThing,
     buildThing,
     setThing,
-    createSolidDataset
+    createSolidDataset,
+    access
 }=require("@inrupt/solid-client");
 
 const{
@@ -28,7 +29,7 @@ class NoteForm extends Component {
         this.state = {redirect: false};
 
         this.saveNote = this.saveNote.bind(this);
-        this.deleteNote = this.deleteNote.bind(this);
+        // this.deleteNote = this.deleteNote.bind(this);
         this.shareNote=this.shareNote.bind(this);
     }
 
@@ -83,6 +84,35 @@ class NoteForm extends Component {
             this.setState({redirect: true});
         }
     }
+
+    async shareNoteAsync(note){
+        let session = getDefaultSession();
+        const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
+        let courseSolidDataset = createSolidDataset();
+
+        const newBookThing1 = buildThing(createThing({ name: note.title }))
+            .addStringNoLocale(SCHEMA_INRUPT.name, "react generated note")
+            .addStringNoLocale(SCHEMA_INRUPT.description, note.description)
+            .addStringNoLocale(SCHEMA_INRUPT.text, note.description)
+            .addUrl(RDF.type, "https://schema.org/TextDigitalDocument")
+            .build();
+
+        courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
+
+        const savedSolidDataset = await saveSolidDatasetAt(
+            "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
+            courseSolidDataset,
+            { fetch: session.fetch }             // fetch from authenticated Session
+        );
+
+        await access.setPublicAccess(
+            "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
+            { read: true, write:false, append:false },
+            { fetch: session.fetch },
+          );
+
+    }
+
     shareNote(event) {
       event.preventDefault();
       if (this.title.value === "") {
@@ -94,38 +124,51 @@ class NoteForm extends Component {
           title: this.title.value,
           description: this.description.value
         }
+
+        this.shareNoteAsync(note).then(ret=>{
+
+        }).catch(e => {
+            console.log(e);
+        });
+
+        let note_ref = {
+            user_card: "https://pod.inrupt.com/pulkit/profile/card#me",
+            user_name: "pulkit",
+            noteURL:  "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
+            title: note.title
+        }
+        // call the backend to save reference to public note
         axios
-          .post('http://localhost:4444/storetoPublicPod', note)
+          .post('http://localhost:4444/storetoPublicPod', note_ref)
           .then(() => console.log('node shared'))
           .catch(err => {
             console.error(err);
           });
         this.props.persistNote(note);
       }
-      this.saveNote(event);
     }
 
-    async deleteNote(note){
-        console.log("delte note ", note.title);
-        let session = getDefaultSession();
-        const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
+    // async deleteNote(note){
+    //     console.log("delte note ", note.title);
+    //     let session = getDefaultSession();
+    //     const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
 
-        const savedSolidDataset = await deleteSolidDataset(
-            "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
-            { fetch: session.fetch }             // fetch from authenticated Session
-        );
-    }
+    //     const savedSolidDataset = await deleteSolidDataset(
+    //         "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
+    //         { fetch: session.fetch }             // fetch from authenticated Session
+    //     );
+    // }
 
-    deleteNote(event) {
-        console.log('deleteNote');
-        event.preventDefault();
-        this.deleteNote(this.props.note).then(ret=>{
+    // deleteNote(event) {
+    //     console.log('deleteNote');
+    //     event.preventDefault();
+    //     this.deleteNote(this.props.note).then(ret=>{
 
-        }).catch(e => {
-            console.log(e);
-        });
-        this.props.deleteNote(this.props.note.id);
-    }
+    //     }).catch(e => {
+    //         console.log(e);
+    //     });
+    //     this.props.deleteNote(this.props.note.id);
+    // }
 
     renderFormTitleAction() {
         return (this.props.note.id !== undefined) ? "Edit Note" : "Add Note";
