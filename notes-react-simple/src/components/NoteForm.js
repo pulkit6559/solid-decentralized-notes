@@ -1,5 +1,22 @@
 import React, {Component} from 'react';
 import { Redirect } from 'react-router';
+import {getDefaultSession} from '@inrupt/solid-client-authn-browser'
+
+const{
+    saveSolidDatasetAt,
+    deleteSolidDataset,
+    createThing,
+    buildThing,
+    setThing,
+    createSolidDataset,
+    access
+}=require("@inrupt/solid-client");
+
+const{
+    RDF,
+    SCHEMA_INRUPT
+}=require("@inrupt/vocab-common-rdf");
+
 var axios = require('axios')
 
 const divStyle = {
@@ -12,8 +29,58 @@ class NoteForm extends Component {
         this.state = {redirect: false};
 
         this.saveNote = this.saveNote.bind(this);
-        this.deleteNote = this.deleteNote.bind(this);
+        // this.deleteNote = this.deleteNote.bind(this);
         this.shareNote=this.shareNote.bind(this);
+    }
+
+    async addNote(note){
+        let session = getDefaultSession();
+        const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
+        let courseSolidDataset = createSolidDataset();
+
+        const newBookThing1 = buildThing(createThing({ name: note.title }))
+            .addStringNoLocale(SCHEMA_INRUPT.name, "react generated note")
+            .addStringNoLocale(SCHEMA_INRUPT.description, note.description)
+            .addStringNoLocale(SCHEMA_INRUPT.text, note.description)
+            .addUrl(RDF.type, "https://schema.org/TextDigitalDocument")
+            .build();
+
+        courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
+
+        const savedSolidDataset = await saveSolidDatasetAt(
+            "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
+            courseSolidDataset,
+            { fetch: session.fetch }             // fetch from authenticated Session
+        );
+
+    }
+
+    async shareWithFriend(note, friendWebID){
+        let session = getDefaultSession();
+        await access.setAgentAccess(
+            "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
+            friendWebID,
+            { read: true, write:false, append:false },
+            { fetch: session.fetch },
+        );
+
+        let req_data = {
+            user_card: "https://pod.inrupt.com/pulkit/profile/card#me",
+            user_name: "pulkit",
+            friend_card: "https://pod.inrupt.com/leslie/profile/card#me",
+            friend_name: "leslie",
+            noteURL:  "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
+            title: note.title
+        }
+
+        axios
+          .post('http://localhost:4444/shareWithWebID', req_data)
+          .then(() => console.log('note shared'))
+          .catch(err => {
+            console.error(err);
+          });
+
+
     }
 
     saveNote(event) {
@@ -28,17 +95,62 @@ class NoteForm extends Component {
                 userWebId: this.userWebId.value,
                 description: this.description.value
             }
-            axios
-            .post('http://localhost:5000/reactNote', note)
-            .then(() => console.log('Book Created'))
-            .catch(err => {
-              console.error(err);
+
+            this.addNote(note).then(ret=>{
+                if (!(note.userWebId === "")){
+                    console.log("SHARING WITH USER")
+                    this.shareWithFriend(note, "https://pod.inrupt.com/leslie/profile/card#me").then(ret=>{
+    
+                    }).catch(e => {
+                        console.log(e);
+                    });
+    
+                }
+            }).catch(e => {
+                console.log(e);
             });
+
+           
+            // axios
+            // .post('http://localhost:4444/reactNote', note)
+            // .then(() => console.log('Book Created'))
+            // .catch(err => {
+            //   console.error(err);
+            // });
 
             this.props.persistNote(note);
             this.setState({redirect: true});
         }
     }
+
+    async shareNoteAsync(note){
+        let session = getDefaultSession();
+        const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
+        let courseSolidDataset = createSolidDataset();
+
+        const newBookThing1 = buildThing(createThing({ name: note.title }))
+            .addStringNoLocale(SCHEMA_INRUPT.name, "react generated note")
+            .addStringNoLocale(SCHEMA_INRUPT.description, note.description)
+            .addStringNoLocale(SCHEMA_INRUPT.text, note.description)
+            .addUrl(RDF.type, "https://schema.org/TextDigitalDocument")
+            .build();
+
+        courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
+
+        const savedSolidDataset = await saveSolidDatasetAt(
+            "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
+            courseSolidDataset,
+            { fetch: session.fetch }             // fetch from authenticated Session
+        );
+
+        await access.setPublicAccess(
+            "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
+            { read: true, write:false, append:false },
+            { fetch: session.fetch },
+          );
+
+    }
+
     shareNote(event) {
       event.preventDefault();
       if (this.title.value === "") {
@@ -50,22 +162,51 @@ class NoteForm extends Component {
           title: this.title.value,
           description: this.description.value
         }
+
+        this.shareNoteAsync(note).then(ret=>{
+
+        }).catch(e => {
+            console.log(e);
+        });
+
+        let note_ref = {
+            user_card: "https://pod.inrupt.com/pulkit/profile/card#me",
+            user_name: "pulkit",
+            noteURL:  "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
+            title: note.title
+        }
+        // call the backend to save reference to public note
         axios
-          .post('http://localhost:5000/storetoPublicPod', note)
+          .post('http://localhost:4444/storetoPublicPod', note_ref)
           .then(() => console.log('node shared'))
           .catch(err => {
             console.error(err);
           });
         this.props.persistNote(note);
       }
-      this.saveNote(event);
     }
 
-    deleteNote(event) {
-        console.log('deleteNote');
-        event.preventDefault();
-        this.props.deleteNote(this.props.note.id);
-    }
+    // async deleteNote(note){
+    //     console.log("delte note ", note.title);
+    //     let session = getDefaultSession();
+    //     const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
+
+    //     const savedSolidDataset = await deleteSolidDataset(
+    //         "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
+    //         { fetch: session.fetch }             // fetch from authenticated Session
+    //     );
+    // }
+
+    // deleteNote(event) {
+    //     console.log('deleteNote');
+    //     event.preventDefault();
+    //     this.deleteNote(this.props.note).then(ret=>{
+
+    //     }).catch(e => {
+    //         console.log(e);
+    //     });
+    //     this.props.deleteNote(this.props.note.id);
+    // }
 
     renderFormTitleAction() {
         return (this.props.note.id !== undefined) ? "Edit Note" : "Add Note";

@@ -113,8 +113,8 @@ app.get("/afterLogin", async (req, res) => {
 
   // 5. `session` now contains an authenticated Session instance.
   if (session.info.isLoggedIn) {
-    // res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
-    res.redirect("http://localhost:3000/");
+    res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
+    // res.redirect("http://localhost:3000/");
   }
   else{
     // res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
@@ -182,7 +182,6 @@ app.post("/storetoPublicPod", async (req, res) => {
     .addStringNoLocale(SCHEMA_INRUPT.text, "https://pod.inrupt.com/pulkit/Notesdump/" + req.body.title)
     .build();
 
-
   courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
   // courseSolidDataset2 = setThing(courseSolidDataset2, newTextThing2);
 
@@ -193,9 +192,19 @@ app.post("/storetoPublicPod", async (req, res) => {
   );
 
 
+  // add read access to everyone
   await access.setPublicAccess(
-    "https://pod.inrupt.com/pulkit/Notesdump/" + req.body.title,
+    "https://pod.inrupt.com/leslie/publicSolidPodFile/" + req.body.title,
+    { read: true, write:false, append:false },
+    { fetch: session.fetch },
+  );
+
+  // add write access to note owner
+  await access.setAccessFor(
+    "https://pod.inrupt.com/leslie/publicSolidPodFile/" + req.body.title,
+    "agent",
     { read: true, write:true, append:false },
+    req.body.user_card,
     { fetch: session.fetch },
   );
   
@@ -216,27 +225,28 @@ app.get("/giveAccessTo", async (req, res) => {
 });
 
 
-app.get("/shareWithWebID", async (req, res) => {
+app.post("/shareWithWebID", async (req, res) => {
   const session = app.locals.session;
+  console.log("SHARING: ", req.body)
 
   // ************** this call should be moved to frontend *****************
   // set access of the note 'test' as 'write' for leslie's webID (need user's session)
-  await access.setAgentAccess(
-    "https://pod.inrupt.com/pulkit/Notesdump/" + 'test',
-    'https://pod.inrupt.com/leslie/profile/card#me',
-    { read: true, write:true, append:false },
-    { fetch: session.fetch },
-  );
-  
+  // await access.setAgentAccess(
+  //   "https://pod.inrupt.com/pulkit/Notesdump/" + 'test',
+  //   'https://pod.inrupt.com/leslie/profile/card#me',
+  //   { read: true, write:true, append:false },
+  //   { fetch: session.fetch },
+  // );
+  let courseSolidDataset = createSolidDataset();
 
   // ********* the URL of note should be provided in the request of this endpoint *********
   //  create thing object AppPod/Leslie/author_test_ref with URL of note
-  const newBookThing1 = buildThing(createThing({ name: "pulkit_test_ref" }))
-  .addStringNoLocale(SCHEMA_INRUPT.text, "https://pod.inrupt.com/pulkit/Notesdump/" + "test")
+  const newBookThing1 = buildThing(createThing({ name: req.body.user_name + "_" + req.body.title+"_ref" }))
+  .addStringNoLocale(SCHEMA_INRUPT.text, req.body.noteURL)
   .build();
   courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
   const savedSolidDataset = await saveSolidDatasetAt(
-    "https://pod.inrupt.com/leslie/Users/" + "leslie/" + "pulkit_test_ref",
+    "https://pod.inrupt.com/leslie/Users/" + "leslie/" + req.body.user_name + "_" + req.body.title+"_ref",
     courseSolidDataset,
     { fetch: session.fetch }             // fetch from authenticated Session
   );
@@ -244,6 +254,13 @@ app.get("/shareWithWebID", async (req, res) => {
   // ****************** need AppPod's session here ********************
   // set access of AppPod/Users/Leslie/author_test_ref as 'read' 
   // for leslie and 'write' for  pulkit (need AppPod's session)
+
+  await access.setAgentAccess(
+    "https://pod.inrupt.com/leslie/Users/" + "leslie/" + req.body.user_name + "_" +req.body.title+"_ref",
+    req.body.user_card,
+    { read: true, write:true, append:true },
+    { fetch: session.fetch },
+  );
 
   res.send("Added access to file for leslie")
 });
