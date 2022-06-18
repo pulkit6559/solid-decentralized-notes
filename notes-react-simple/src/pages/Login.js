@@ -14,7 +14,8 @@ const {
     getStringNoLocale,
     getStringWithLocale,
     getStringByLocaleAll,
-    getUrlAll
+    getUrlAll,
+    createContainerAt
   } = require("@inrupt/solid-client");
 
 
@@ -53,6 +54,14 @@ async function loginAndFetch() {
     }
   }
 
+async function get_auth_code(session){
+  // create folder notes_auth or check if it exists
+  await createContainerAt("https://pod.inrupt.com/pulkit/notesAuth",
+  { fetch: session.fetch });
+  // assign leslie write access
+  // send request to server to write code
+} 
+
 async function get_session () { 
     loginAndFetch();
     // let session = sessionStorage.getItem("session");
@@ -75,10 +84,24 @@ export class LoginComponent extends Component {
             // error
             console.log(e);
         });
+
+        get_auth_code(getDefaultSession()).then(session => {
+          // got value here
+          console.log("SUCCESS in creating empty auth folder")
+        }).catch(e => {
+          console.log('Auth folder exists')
+        });
+
     }
     else{
         let session = getDefaultSession();
         console.log(session);
+        get_auth_code(getDefaultSession()).then(session => {
+          // got value here
+          console.log("SUCCESS in creating empty auth folder")
+        }).catch(e => {
+          console.log('Auth folder exists')
+        });
     }
 
     return(
