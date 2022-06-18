@@ -246,21 +246,23 @@ app.post("/shareWithWebID", async (req, res) => {
   .build();
   courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
   const savedSolidDataset = await saveSolidDatasetAt(
-    "https://pod.inrupt.com/leslie/Users/" + "leslie/" + req.body.user_name + "_" + req.body.title+"_ref",
+    "https://pod.inrupt.com/leslie/Users/" + req.body.friend_name + "/" + req.body.user_name + "_" + req.body.title+"_ref",
     courseSolidDataset,
     { fetch: session.fetch }             // fetch from authenticated Session
   );
 
+  console.log("https://pod.inrupt.com/leslie/Users/" + req.body.friend_name + "/" + req.body.user_name + "_" + req.body.title+"_ref")
   // ****************** need AppPod's session here ********************
   // set access of AppPod/Users/Leslie/author_test_ref as 'read' 
   // for leslie and 'write' for  pulkit (need AppPod's session)
 
   await access.setAgentAccess(
-    "https://pod.inrupt.com/leslie/Users/" + "leslie/" + req.body.user_name + "_" +req.body.title+"_ref",
+    "https://pod.inrupt.com/leslie/Users/" + req.body.friend_name + "/" + req.body.user_name + "_" +req.body.title+"_ref",
     req.body.user_card,
     { read: true, write:true, append:true },
     { fetch: session.fetch },
   );
+  console.log("SHARING COMPLETE")
 
   res.send("Added access to file for leslie")
 });
