@@ -6,6 +6,7 @@ const {
   getStringNoLocale,
   getStringWithLocale,
   getStringByLocaleAll,
+  setStringNoLocale,
   getUrlAll
 } = require("@inrupt/solid-client");
 
@@ -54,6 +55,7 @@ app.use(
       "Required, but value not relevant for this demo - key2",
     ],
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: false
   })
 );
 
@@ -246,21 +248,23 @@ app.post("/shareWithWebID", async (req, res) => {
   .build();
   courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
   const savedSolidDataset = await saveSolidDatasetAt(
-    "https://pod.inrupt.com/leslie/Users/" + "leslie/" + req.body.user_name + "_" + req.body.title+"_ref",
+    "https://pod.inrupt.com/leslie/Users/" + req.body.friend_name + "/" + req.body.user_name + "_" + req.body.title+"_ref",
     courseSolidDataset,
     { fetch: session.fetch }             // fetch from authenticated Session
   );
 
+  console.log("https://pod.inrupt.com/leslie/Users/" + req.body.friend_name + "/" + req.body.user_name + "_" + req.body.title+"_ref")
   // ****************** need AppPod's session here ********************
   // set access of AppPod/Users/Leslie/author_test_ref as 'read' 
   // for leslie and 'write' for  pulkit (need AppPod's session)
 
   await access.setAgentAccess(
-    "https://pod.inrupt.com/leslie/Users/" + "leslie/" + req.body.user_name + "_" +req.body.title+"_ref",
+    "https://pod.inrupt.com/leslie/Users/" + req.body.friend_name + "/" + req.body.user_name + "_" +req.body.title+"_ref",
     req.body.user_card,
     { read: true, write:true, append:true },
     { fetch: session.fetch },
   );
+  console.log("SHARING COMPLETE")
 
   res.send("Added access to file for leslie")
 });
@@ -320,6 +324,46 @@ app.get("/readNote", async (req, res) => {
   res.send(name_description);
   console.log("Done reading_3");
 });
+
+app.post("/writeUserAuth", async (req, res) => {
+    const session = app.locals.session;
+
+    let webID = req.body.webID;
+    console.log(req.body, webID)
+    
+    let pod_url = webID.replace("/profile/card#me", "");
+    let auth_url = pod_url + '/notesAuth';
+    let resourceURL = auth_url+'/code';
+
+    let authCodeDataset = await getSolidDataset(
+      resourceURL,
+      { fetch: session.fetch }
+    );
+    
+    console.log(authCodeDataset);
+
+    let authThing = getThing(authCodeDataset, resourceURL + '#code');
+    authThing = setStringNoLocale(authThing, SCHEMA_INRUPT.accessCode, "4444");
+    authCodeDataset = setThing(authCodeDataset, authThing);
+
+    const savedSolidDataset = await saveSolidDatasetAt(
+      resourceURL,
+      authCodeDataset,
+      { fetch: session.fetch }             // fetch from authenticated Session
+    );
+
+    // let dataset = createSolidDataset();
+
+    // const code_thing = buildThing(createThing({ name: req.body.user_name + "_" + req.body.title+"_ref" }))
+    // .addStringNoLocale(SCHEMA_INRUPT.accessCode, '4444')
+    // .build();
+    // dataset = setThing(dataset, code_thing);
+    // const savedSolidDataset = await saveSolidDatasetAt(
+    //   auth_url+"/code",
+    //   dataset,
+    //   { fetch: session.fetch }             // fetch from authenticated Session
+    // );
+})
 
 
 app.listen(port, function()

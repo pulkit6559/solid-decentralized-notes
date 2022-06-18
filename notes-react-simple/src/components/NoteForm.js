@@ -55,7 +55,7 @@ class NoteForm extends Component {
 
     }
 
-    async shareWithFriend(note, friendWebID){
+    async shareWithFriend(note, friendWebID, friendName){
         let session = getDefaultSession();
         await access.setAgentAccess(
             "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
@@ -67,8 +67,8 @@ class NoteForm extends Component {
         let req_data = {
             user_card: "https://pod.inrupt.com/pulkit/profile/card#me",
             user_name: "pulkit",
-            friend_card: "https://pod.inrupt.com/leslie/profile/card#me",
-            friend_name: "leslie",
+            friend_card: friendWebID,
+            friend_name: friendName,
             noteURL:  "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
             title: note.title
         }
@@ -99,7 +99,7 @@ class NoteForm extends Component {
             this.addNote(note).then(ret=>{
                 if (!(note.userWebId === "")){
                     console.log("SHARING WITH USER")
-                    this.shareWithFriend(note, "https://pod.inrupt.com/leslie/profile/card#me").then(ret=>{
+                    this.shareWithFriend(note, "https://pod.inrupt.com/" + note.userWebId + "/profile/card#me", note.userWebId).then(ret=>{
     
                     }).catch(e => {
                         console.log(e);

@@ -4,6 +4,8 @@ import { Redirect } from 'react-router'
 
 import NotesApp from './NotesApp';
 import Home from './Home';
+var axios = require('axios')
+
 // import {Store, useGlobalState} from 'state-pool';
 
 const {
@@ -14,8 +16,23 @@ const {
     getStringNoLocale,
     getStringWithLocale,
     getStringByLocaleAll,
-    getUrlAll
+    getUrlAll,
+    createContainerAt,
+    access,
+    getResourceInfoWithAcl,
+    saveSolidDatasetAt,
+    createThing,
+    buildThing,
+    setThing,
+    createSolidDataset,
   } = require("@inrupt/solid-client");
+
+  const{
+    FOAF,
+    VCARD,
+    RDF,
+    SCHEMA_INRUPT
+  }=require("@inrupt/vocab-common-rdf");
 
 
 
@@ -53,6 +70,54 @@ async function loginAndFetch() {
     }
   }
 
+async function create_auth_container(session){
+  // create folder notes_auth or check if it exists
+  // await createContainerAt("https://pod.inrupt.com/pulkit/notesAuth",
+  // { fetch: session.fetch });
+  // assign leslie write access
+
+  let auth_url = "https://pod.inrupt.com/pulkit/notesAuth"
+
+  let dataset = createSolidDataset();
+  const code_thing = buildThing(createThing({ name: 'code'}))
+  .addStringNoLocale(SCHEMA_INRUPT.accessCode, 'xxxx')
+  .build();
+  dataset = setThing(dataset, code_thing);
+  const savedSolidDataset = await saveSolidDatasetAt(
+    auth_url+"/code",
+    dataset,
+    { fetch: session.fetch }             // fetch from authenticated Session
+  );
+
+  await access.setAgentAccess(
+    auth_url+"/code",
+    "https://pod.inrupt.com/leslie/profile/card#me",
+    { read: true, write:true, append:true },
+    { fetch: session.fetch },
+  );
+  // let acl = await getResourceInfoWithAcl(
+  //   "https://pod.inrupt.com/pulkit/notesAuth",
+  //   { fetch: session.fetch },
+  // )
+  // return acl
+  // send request to server to write code
+} 
+
+function get_auth_code(session){
+  let web_id = session.info.webId
+  console.log(session.info.webId)
+  let user_data = {
+    webID: web_id
+  }
+
+  axios
+  .post('http://localhost:4444/writeUserAuth', user_data)
+  .then(() => console.log('Auth code written'))
+  .catch(err => {
+    console.error(err);
+  });
+}
+
 async function get_session () { 
     loginAndFetch();
     // let session = sessionStorage.getItem("session");
@@ -75,10 +140,35 @@ export class LoginComponent extends Component {
             // error
             console.log(e);
         });
+
+        create_auth_container(getDefaultSession()).then(session => {
+          // got value here
+          console.log(session)
+          console.log("SUCCESS in creating empty auth folder")
+        }).catch(e => {
+          console.log(e);
+          console.log('Auth folder exists')
+        });
+
     }
     else{
         let session = getDefaultSession();
         console.log(session);
+        create_auth_container(getDefaultSession()).then(session => {
+          // got value here
+          console.log(session)
+          console.log("SUCCESS in creating empty auth folder")
+        }).catch(e => {
+          console.log(e);
+          console.log('Auth folder exists')
+        });
+    }
+
+    // make server write the code
+    try{
+      get_auth_code(getDefaultSession());
+    } catch (error) {
+      console.log(error)
     }
 
     return(

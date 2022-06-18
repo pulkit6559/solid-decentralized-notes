@@ -113,13 +113,13 @@ const {
     if (session.info.isLoggedIn) {
       // res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
       const myDataset = await getSolidDataset(
-        "https://pod.inrupt.com/pulkit/Notesdump/test",
+        "https://pod.inrupt.com/pulkit/notesAuth",
         { fetch: session.fetch }          // fetch from authenticated session
       );
         
       console.log(myDataset);
 
-
+      res.send(myDataset)
     //   res.redirect("http://localhost:3000/");
     }
     else{
