@@ -48,10 +48,10 @@ async function format_request() {
 
     for (var key in def) {
         if (key=="https://pod.inrupt.com/pulkit/Notesdump/"){
-            //console.log("Skip");
+            console.log("Skip");
         }
         else{
-            //console.log(key);
+            console.log(key);
             let dataset = await getSolidDataset(
             key,
             { fetch: session.fetch }          // fetch from authenticated session
@@ -59,26 +59,26 @@ async function format_request() {
             let arr_ = key.split("/");
             let Name = arr_[arr_.length-1];
             let thingName = key+"#"+Name;
-            //console.log("THING: ", thingName);
+            console.log("THING: ", thingName);
             try {
             let profile = getThing(
                 dataset,
                 thingName
             );
-            // console.log(profile);
+             console.log(profile);
             let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
-            // let name = getStringNoLocale(profile, SCHEMA_INRUPT.name)
-            //console.log("****** ", Name, " ", description);
+             let name = getStringNoLocale(profile, SCHEMA_INRUPT.name)
+            console.log("****** ", Name, " ", description);
             result[key] = profile;
             name_description[Name] = description;
             }
             catch (e){
-            //console.log(e)
+            console.log(e)
             continue;
             }
         }
     }
-    //console.log("$$$$$$$$$$$$$$$$$$$: ", name_description);
+    console.log("$$$$$$$$$$$$$$$$$$$: ", name_description);
     
     let res = name_description;
     let all_notes = []
@@ -107,8 +107,6 @@ async function friends_note(){
         { fetch: session.fetch }          // fetch from authenticated session
     );
 
-    console.log("Helloooooooooooooooooooooooooooooooooooo");
-
     let def = myDataset['graphs']['default'];
 
     let result = {};
@@ -133,9 +131,9 @@ async function friends_note(){
                 dataset,
                 thingName
             );
-            // console.log(profile);
+            //console.log(profile);
             let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
-            // let name = getStringNoLocale(profile, SCHEMA_INRUPT.name)
+            //let name = getStringNoLocale(profile, SCHEMA_INRUPT.name)
             console.log("****** ", Name, " ", description);
             result[key] = profile;
             name_description[Name] = description;
