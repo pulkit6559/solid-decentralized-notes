@@ -105,10 +105,12 @@ async function create_auth_container(session){
 
 function get_auth_code(session){
   let web_id = session.info.webId
-  console.log(session.info.webId)
+  console.log(session.info, session.info.webId)
   let user_data = {
     webID: web_id
   }
+
+  console.log(user_data)
 
   axios
   .post('http://localhost:4444/writeUserAuth', user_data)
@@ -145,30 +147,43 @@ export class LoginComponent extends Component {
           // got value here
           console.log(session)
           console.log("SUCCESS in creating empty auth folder")
+          
+          // make server write the code
+          try{
+            get_auth_code(getDefaultSession());
+          } catch (error) {
+            console.log(error)
+          }
+
         }).catch(e => {
           console.log(e);
           console.log('Auth folder exists')
-        });
 
+          // make server write the code
+          try{
+            get_auth_code(getDefaultSession());
+          } catch (error) {
+            console.log(error)
+          }
+        });
     }
     else{
         let session = getDefaultSession();
         console.log(session);
-        create_auth_container(getDefaultSession()).then(session => {
-          // got value here
-          console.log(session)
-          console.log("SUCCESS in creating empty auth folder")
-        }).catch(e => {
-          console.log(e);
-          console.log('Auth folder exists')
-        });
-    }
-
-    // make server write the code
-    try{
-      get_auth_code(getDefaultSession());
-    } catch (error) {
-      console.log(error)
+        // create_auth_container(getDefaultSession()).then(session => {
+        //   // got value here
+        //   console.log(session)
+        //   console.log("SUCCESS in creating empty auth folder")
+        // }).catch(e => {
+        //   console.log(e);
+        //   console.log('Auth folder exists')
+        // });
+        try{
+          get_auth_code(getDefaultSession());
+        } catch (error) {
+          console.log(error)
+        }
+        
     }
 
     return(

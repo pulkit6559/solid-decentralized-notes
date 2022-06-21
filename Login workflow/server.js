@@ -59,6 +59,9 @@ app.use(
   })
 );
 
+app.locals.accesCodes = [];
+app.locals.userCodeStore = {};
+
 
 app.get('/', async function(req, res)
 {
@@ -325,6 +328,24 @@ app.get("/readNote", async (req, res) => {
   console.log("Done reading_3");
 });
 
+function getUniqueAccessCode(){
+  var numStr = 0
+  while (true){
+    var num = Math.floor(Math.random() * 1000) + 9999
+    numStr = num.toString()
+    if (!app.locals.accesCodes.includes(numStr)){
+      break
+    }
+  }
+
+  return numStr
+}
+
+function updateUserCode(webID, code){
+  app.locals.userCodeStore[webID] = code
+  app.locals.accesCodes.push(code)
+}
+
 app.post("/writeUserAuth", async (req, res) => {
     const session = app.locals.session;
 
@@ -341,9 +362,12 @@ app.post("/writeUserAuth", async (req, res) => {
     );
     
     console.log(authCodeDataset);
-
+    
+    let accCode = getUniqueAccessCode();
+    updateUserCode(webID, accCode)
+    console.log("USER CODES: ", app.locals.userCodeStore)
     let authThing = getThing(authCodeDataset, resourceURL + '#code');
-    authThing = setStringNoLocale(authThing, SCHEMA_INRUPT.accessCode, "4444");
+    authThing = setStringNoLocale(authThing, SCHEMA_INRUPT.accessCode, accCode);
     authCodeDataset = setThing(authCodeDataset, authThing);
 
     const savedSolidDataset = await saveSolidDatasetAt(
