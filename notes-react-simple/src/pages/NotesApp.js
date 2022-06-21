@@ -98,6 +98,103 @@ async function format_request() {
     return all_notes
 }
 
+async function public_note(){
+  // const res = await axios.get('http://localhost:4444/readNote');
+
+  let session = getDefaultSession();
+  const notes_url = "https://pod.inrupt.com/leslie/publicSolidPodFile/"
+  const myDataset = await getSolidDataset(
+    notes_url,
+    { fetch: session.fetch }          // fetch from authenticated session
+  );
+
+
+  let def = myDataset['graphs']['default'];
+
+  let result = {};
+  let name_description = {}
+  let all_notes = []
+  let id=1
+
+  for (var key in def) {
+    if (key=="https://pod.inrupt.com/leslie/publicSolidPodFile/"){
+      console.log("Skip");
+    }
+    else{
+      console.log(key);
+      let dataset = await getSolidDataset(
+        key,
+        { fetch: session.fetch }          // fetch from authenticated session
+      );
+      let arr_ = key.split("/");
+      let Name = arr_[arr_.length-1];
+      let thingName = key+"#"+Name;
+      console.log("THING: ", thingName);
+      try {
+        let profile = getThing(
+          dataset,
+          thingName
+        );
+        console.log(profile);
+        let url = getStringNoLocale(profile, SCHEMA_INRUPT.text);
+        let title = getStringNoLocale(profile, SCHEMA_INRUPT.description);
+        let name = getStringNoLocale(profile, SCHEMA_INRUPT.name)
+        console.log( " ", url);
+        let dataSet=undefined;
+        try {
+           dataSet = await getSolidDataset(
+            url,
+            {fetch: session.fetch}          // fetch from authenticated session
+          );
+        }
+        catch (e)
+        {
+          continue;
+        }
+        console.log("get the data",dataSet);
+        try{
+
+          let arr_ = url.split("/");
+          let Name = arr_[arr_.length-1];
+          let thingName = url+"#"+Name;
+
+          let profile = getThing(
+            dataSet,
+            thingName);
+          console.log("thing",profile)
+          let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
+          console.log("description",description)
+
+          all_notes.push(
+            {
+              'id':id,
+              'title':Name,
+              'description': description,
+              'date': "2022-05-30T09:33:56.543Z"
+            }
+          )
+          id+=1
+        }
+        catch (e)
+        {
+          console.log("something is wrong")
+          continue;
+        }
+
+        console.log("shared note",myDataset);
+        result[key] = profile;
+
+      }
+      catch (e){
+        console.log(e)
+        continue;
+      }
+    }
+  }
+  console.log("all_notes", all_notes);
+  return all_notes
+}
+
 async function friends_note(){
     let session = getDefaultSession();
     let notes_url = "https://pod.inrupt.com/leslie/Users/pulkit/"
@@ -175,6 +272,7 @@ class NotesApp extends Component {
 
         let all_notes = [];
         let friend_notes = [];
+        let public_notes=[];
         
         format_request().then(ret => {
             all_notes = ret;
@@ -193,14 +291,24 @@ class NotesApp extends Component {
         }).catch(e => {
             console.log(e);
         });
+
+        public_note().then(ret=>{
+          public_notes = ret;
+          console.log("Type of : localstorage",JSON.parse(localStorage.getItem('notes')));
+          console.log("Type of : all_notes", public_notes);
+          this.setState({public_notes: public_notes})
+        }).catch(e => {
+          console.log(e);
+        })
         
         // let notes = localStorage.getItem('notes') ? JSON.parse(localStorage.getItem('notes')) : [];
-        let notes = [all_notes, friend_notes];
+        let notes = [all_notes, friend_notes,public_notes];
         
         console.log(notes);
         this.state = {
             notes: notes[0],
             friend_notes: notes[1],
+            public_notes: notes[2],
             selectedNote: null,
             editMode: false
         };
@@ -213,6 +321,7 @@ class NotesApp extends Component {
         this.openEditNote = this.openEditNote.bind(this);
         this.saveEditedNote = this.saveEditedNote.bind(this);
         this.deleteNote = this.deleteNote.bind(this);
+        this.viewNote_PublicNote=this.viewNote_PublicNote.bind(this);
     }
 
     getNotesNextId() {
@@ -249,6 +358,7 @@ class NotesApp extends Component {
     }
 
     viewNote_friendsnote(id){
+
         const notePosition = this.state.friend_notes.findIndex((n) => n.id == id);
         if (notePosition >= 0){
             this.setState({selectedNote: this.state.friend_notes[notePosition], editMode: false});
@@ -256,6 +366,15 @@ class NotesApp extends Component {
             console.warn('note with id ' + id + ' not found when trying to edit it');
         }
     }
+
+  viewNote_PublicNote(id){
+    const notePosition = this.state.public_notes.findIndex((n) => n.id === id);
+    if (notePosition >= 0){
+      this.setState({selectedNote: this.state.public_notes[notePosition], editMode: false});
+    } else{
+      console.warn('note with id ' + id + ' not found when trying to edit it');
+    }
+  }
 
 
     openEditNote(id) {
@@ -337,6 +456,17 @@ class NotesApp extends Component {
             </div>
         )
       }
+
+  renderPublicNotes() {
+    return (
+      <div className="card">
+        {this.renderFriendSharedNoteHeader()}
+        <div className="card-body">
+          <NotesListMenu notes={this.state.public_notes} viewNote={this.viewNote_PublicNote}/>
+        </div>
+      </div>
+    )
+  }
   
   
   
@@ -377,6 +507,10 @@ class NotesApp extends Component {
                     <div className="col-md-3">
                         {this.renderRightMenu()}
                     </div>
+
+                  <div className="col-md-3">
+                    {this.renderPublicNotes()}
+                  </div>
                     
                     <div className="col-md-9">
                         {this.setMainAreaRoutes()}
