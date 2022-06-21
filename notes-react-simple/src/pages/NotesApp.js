@@ -48,6 +48,74 @@ async function format_request() {
 
     for (var key in def) {
         if (key=="https://pod.inrupt.com/pulkit/Notesdump/"){
+            //console.log("Skip");
+        }
+        else{
+            //console.log(key);
+            let dataset = await getSolidDataset(
+            key,
+            { fetch: session.fetch }          // fetch from authenticated session
+            );
+            let arr_ = key.split("/");
+            let Name = arr_[arr_.length-1];
+            let thingName = key+"#"+Name;
+            //console.log("THING: ", thingName);
+            try {
+            let profile = getThing(
+                dataset,
+                thingName
+            );
+            // console.log(profile);
+            let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
+            // let name = getStringNoLocale(profile, SCHEMA_INRUPT.name)
+            //console.log("****** ", Name, " ", description);
+            result[key] = profile;
+            name_description[Name] = description;
+            }
+            catch (e){
+            //console.log(e)
+            continue;
+            }
+        }
+    }
+    //console.log("$$$$$$$$$$$$$$$$$$$: ", name_description);
+    
+    let res = name_description;
+    let all_notes = []
+    let id = 1;
+
+    for (var title in res){
+        all_notes.push(
+            {
+                'id':id,
+                'title':title,
+                'description': res[title],
+                'date': "2022-05-30T09:33:56.543Z"
+            }
+        )
+        id = id + 1;
+    }
+    return all_notes
+}
+
+async function friends_note(){
+    let session = getDefaultSession();
+    let notes_url = "https://pod.inrupt.com/leslie/Users/pulkit/"
+    
+    const myDataset = await getSolidDataset(
+        notes_url,
+        { fetch: session.fetch }          // fetch from authenticated session
+    );
+
+    console.log("Helloooooooooooooooooooooooooooooooooooo");
+
+    let def = myDataset['graphs']['default'];
+
+    let result = {};
+    let name_description = {}
+
+    for (var key in def) {
+        if (key=="https://pod.inrupt.com/leslie/Users/pulkit/"){
             console.log("Skip");
         }
         else{
@@ -73,19 +141,19 @@ async function format_request() {
             name_description[Name] = description;
             }
             catch (e){
-            console.log(e)
-            continue;
+                console.log(e)
+                continue;
             }
         }
     }
     console.log("$$$$$$$$$$$$$$$$$$$: ", name_description);
     
     let res = name_description;
-    let all_notes = []
+    let friends_notes = []
     let id = 1;
 
     for (var title in res){
-        all_notes.push(
+        friends_notes.push(
             {
                 'id':id,
                 'title':title,
@@ -95,14 +163,20 @@ async function format_request() {
         )
         id = id + 1;
     }
-    return all_notes
+    return friends_notes;
 }
+
+
+
+
+
 
 class NotesApp extends Component {
     constructor(props) {
         super(props);
 
         let all_notes = [];
+        let friend_notes = [];
         
         format_request().then(ret => {
             all_notes = ret;
@@ -112,19 +186,32 @@ class NotesApp extends Component {
         }).catch(e => {
             console.log(e);
         });
+
+        friends_note().then(ret => {
+            friend_notes = ret;
+            console.log("Type of : localstorage",JSON.parse(localStorage.getItem('notes')));
+            console.log("Type of : all_notes", friend_notes);
+            this.setState({friend_notes: friend_notes})
+        }).catch(e => {
+            console.log(e);
+        });
         
         // let notes = localStorage.getItem('notes') ? JSON.parse(localStorage.getItem('notes')) : [];
-        let notes = all_notes;
+        let notes = [all_notes, friend_notes];
+        
         console.log(notes);
         this.state = {
-            notes: notes,
+            notes: notes[0],
+            friend_notes: notes[1],
             selectedNote: null,
             editMode: false
         };
 
         this.getNotesNextId = this.getNotesNextId.bind(this);
+        this.getfriendsNotesNextId = this.getfriendsNotesNextId.bind(this);
         this.addNote = this.addNote.bind(this);
         this.viewNote = this.viewNote.bind(this);
+        this.viewNote_friendsnote = this.viewNote_friendsnote.bind(this);
         this.openEditNote = this.openEditNote.bind(this);
         this.saveEditedNote = this.saveEditedNote.bind(this);
         this.deleteNote = this.deleteNote.bind(this);
@@ -132,6 +219,10 @@ class NotesApp extends Component {
 
     getNotesNextId() {
         return this.state.notes.length > 0 ? this.state.notes[this.state.notes.length - 1].id + 1 : 0;
+    }
+
+    getfriendsNotesNextId() {
+        return this.state.friend_notes.length > 0 ? this.state.friend_notes[this.state.friend_notes.length - 1].id + 1 : 0;
     }
 
     persistNotes(notes) {
@@ -158,6 +249,16 @@ class NotesApp extends Component {
             console.warn('note with id ' + id + ' not found when trying to edit it');
         }
     }
+
+    viewNote_friendsnote(id){
+        const notePosition = this.state.friend_notes.findIndex((n) => n.id == id);
+        if (notePosition >= 0){
+            this.setState({selectedNote: this.state.friend_notes[notePosition], editMode: false});
+        } else{
+            console.warn('note with id ' + id + ' not found when trying to edit it');
+        }
+    }
+
 
     openEditNote(id) {
         const notePosition = this.state.notes.findIndex((n) => n.id === id);
@@ -227,6 +328,28 @@ class NotesApp extends Component {
         )
     }
 
+
+    renderRightMenu () {
+        return (
+            <div className="card">
+                {this.renderFriendSharedNoteHeader()}
+                <div className="card-body">
+                    <NotesListMenu notes={this.state.friend_notes} viewNote={this.viewNote_friendsnote}/>
+                </div>
+            </div>
+        )
+      }
+  
+  
+  
+    renderFriendSharedNoteHeader() {
+    return (
+        <div className="card-header">
+            <h5 class="card-title">Shared Notes by Friends</h5>
+        </div>
+    )
+    }
+  
     setMainAreaRoutes() {
         const editMode = this.state.editMode;
         return (<div>
@@ -252,6 +375,11 @@ class NotesApp extends Component {
                     <div className="col-md-3">
                         {this.renderLeftMenu()}
                     </div>
+
+                    <div className="col-md-3">
+                        {this.renderRightMenu()}
+                    </div>
+                    
                     <div className="col-md-9">
                         {this.setMainAreaRoutes()}
                     </div>
