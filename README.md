@@ -57,10 +57,12 @@ What can our system do:
 3. Public sharing of notes
 4. Display all notes for user
 5. Add friends and share notes with them
-6. (*) Associate notes with tags, eg (private and public) and also with specific tags (Mathematics, physics, screenplay) 
-7. (*) Functionality for users to give edit suggestions to public “read-only” notes
-8. (*) Link ideas -> create a knowledge graph (a sentence/phrase in note X can be linked-to note Y) 
-(*) Tentative functionalities, not to be included in the POC. Included in a complex data exchange scenario
+
+## Future possible work
+1. (*) Associate notes with tags, eg (private and public) and also with specific tags (Mathematics, physics, screenplay) 
+2. (*) Functionality for users to give edit suggestions to public “read-only” notes
+3. (*) Link ideas -> create a knowledge graph (a sentence/phrase in note X can be linked-to note Y) 
+4. (*) Tentative functionalities, not to be included in the POC. Included in a complex data exchange scenario
 
 
 ## Already Accomplished
@@ -85,8 +87,10 @@ Currently working on open issues:
 - n/a
 
 ## To-dos
-- n/a
-
+- Create final presentation
+- Create final poster
+- Clean code
+- Finalise model and use case scenario
 
 
 ## Authors and acknowledgment
