@@ -39,11 +39,22 @@ class NoteView extends Component {
         this.props.deleteNote(this.props.note.id);
     }
 
+    async editNoteAsync(note){
+        console.log("edit note ", this.props.note.title);
+        this.deleteNoteAsync(this.props.note).then(ret=>{
+
+        }).catch(e => {
+            console.log(e);
+        });
+    }   
+
     editNote(event){
         event.preventDefault();
 
         this.props.editNote(this.props.note.id);
+        this.editNoteAsync(this.props.note);
     }
+
 
     renderFormattedDate(){
         return 'Last edited:' + moment(this.props.note.date).format("DD MMM YYYY [at] HH:mm");
