@@ -38,21 +38,27 @@ class NoteForm extends Component {
         const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
         let courseSolidDataset = createSolidDataset();
 
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+
+        today = mm + '/' + dd + '/' + yyyy;
         const newBookThing1 = buildThing(createThing({ name: note.title }))
             .addStringNoLocale(SCHEMA_INRUPT.name, "react generated note")
             .addStringNoLocale(SCHEMA_INRUPT.description, note.description)
             .addStringNoLocale(SCHEMA_INRUPT.text, note.description)
+            .addStringNoLocale(SCHEMA_INRUPT.endDate, today)
             .addUrl(RDF.type, "https://schema.org/TextDigitalDocument")
             .build();
 
         courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
-
+        
         const savedSolidDataset = await saveSolidDatasetAt(
             "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
             courseSolidDataset,
             { fetch: session.fetch }             // fetch from authenticated Session
         );
-
     }
 
     async shareWithFriend(note, friendWebID, friendName){

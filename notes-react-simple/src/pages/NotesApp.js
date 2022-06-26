@@ -44,7 +44,8 @@ async function format_request() {
     let def = myDataset['graphs']['default'];
 
     let result = {};
-    let name_description = {}
+    let name_description = {};
+    let dates = {};
 
     for (var key in def) {
         if (key=="https://pod.inrupt.com/pulkit/Notesdump/"){
@@ -59,6 +60,7 @@ async function format_request() {
             let arr_ = key.split("/");
             let Name = arr_[arr_.length-1];
             let thingName = key+"#"+Name;
+            let normal_date = "2022-05-30T09:33:56.543Z";
             console.log("THING: ", thingName);
             try {
             let profile = getThing(
@@ -66,11 +68,17 @@ async function format_request() {
                 thingName
             );
              console.log(profile);
+            let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
             let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
-             let name = getStringNoLocale(profile, SCHEMA_INRUPT.name)
+            //let name = getStringNoLocale(profile, SCHEMA_INRUPT.name);
             console.log("****** ", Name, " ", description);
             result[key] = profile;
             name_description[Name] = description;
+            if (date == null){
+                dates[Name] = normal_date;
+            } else {
+                dates[Name] = date;
+            }
             }
             catch (e){
             console.log(e)
@@ -84,13 +92,14 @@ async function format_request() {
     let all_notes = []
     let id = 1;
 
+    let normal_date = "2022-05-30T09:33:56.543Z";
     for (var title in res){
         all_notes.push(
             {
                 'id':id,
                 'title':title,
                 'description': res[title],
-                'date': "2022-05-30T09:33:56.543Z"
+                'date': dates[title]
             }
         )
         id = id + 1;
@@ -112,9 +121,9 @@ async function public_note(){
   let def = myDataset['graphs']['default'];
 
   let result = {};
-  let name_description = {}
-  let all_notes = []
-  let id=1
+  let name_description = {};
+  let all_notes = [];
+  let id = 1;
 
   for (var key in def) {
     if (key=="https://pod.inrupt.com/leslie/publicSolidPodFile/"){
@@ -137,9 +146,11 @@ async function public_note(){
         );
         console.log(profile);
         let url = getStringNoLocale(profile, SCHEMA_INRUPT.text);
+        let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
         let title = getStringNoLocale(profile, SCHEMA_INRUPT.description);
-        let name = getStringNoLocale(profile, SCHEMA_INRUPT.name)
+        let name = getStringNoLocale(profile, SCHEMA_INRUPT.name);
         console.log( " ", url);
+
         let dataSet=undefined;
         try {
            dataSet = await getSolidDataset(
@@ -153,7 +164,7 @@ async function public_note(){
         }
         console.log("get the data",dataSet);
         try{
-
+          let normal_date = "2022-05-29T09:33:56.543Z";   
           let arr_ = url.split("/");
           let Name = arr_[arr_.length-1];
           let thingName = url+"#"+Name;
@@ -163,14 +174,19 @@ async function public_note(){
             thingName);
           console.log("thing",profile)
           let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
-          console.log("description",description)
+          let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
+          console.log("description",description);
+
+          if (date == null){
+              date = normal_date;
+          }
 
           all_notes.push(
             {
               'id':id,
               'title':Name,
               'description': description,
-              'date': "2022-05-30T09:33:56.543Z"
+              'date': date
             }
           )
           id+=1
@@ -198,6 +214,7 @@ async function public_note(){
 async function friends_note(){
     let session = getDefaultSession();
     let notes_url = "https://pod.inrupt.com/leslie/Users/pulkit/"
+    let normal_date = "2022-05-31T09:33:56.543Z";
     
     const myDataset = await getSolidDataset(
         notes_url,
@@ -207,7 +224,8 @@ async function friends_note(){
     let def = myDataset['graphs']['default'];
 
     let result = {};
-    let name_description = {}
+    let name_description = {};
+    let dates = {};
 
     for (var key in def) {
         if (key=="https://pod.inrupt.com/leslie/Users/pulkit/"){
@@ -230,10 +248,16 @@ async function friends_note(){
             );
             //console.log(profile);
             let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
+            let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
             //let name = getStringNoLocale(profile, SCHEMA_INRUPT.name)
             console.log("****** ", Name, " ", description);
             result[key] = profile;
             name_description[Name] = description;
+            if (date == null){
+                dates[Name] = normal_date;
+            } else {
+                dates[Name] = date;
+            }
             }
             catch (e){
                 console.log(e)
@@ -253,7 +277,7 @@ async function friends_note(){
                 'id':id,
                 'title':title,
                 'description': res[title],
-                'date': "2022-05-30T09:33:56.543Z"
+                'date': dates[title]
             }
         )
         id = id + 1;
@@ -304,7 +328,6 @@ class NotesApp extends Component {
         // let notes = localStorage.getItem('notes') ? JSON.parse(localStorage.getItem('notes')) : [];
         let notes = [all_notes, friend_notes,public_notes];
         
-        console.log(notes);
         this.state = {
             notes: notes[0],
             friend_notes: notes[1],
@@ -367,14 +390,14 @@ class NotesApp extends Component {
         }
     }
 
-  viewNote_PublicNote(id){
-    const notePosition = this.state.public_notes.findIndex((n) => n.id === id);
-    if (notePosition >= 0){
-      this.setState({selectedNote: this.state.public_notes[notePosition], editMode: false});
-    } else{
-      console.warn('note with id ' + id + ' not found when trying to edit it');
+    viewNote_PublicNote(id){
+        const notePosition = this.state.public_notes.findIndex((n) => n.id === id);
+        if (notePosition >= 0){
+        this.setState({selectedNote: this.state.public_notes[notePosition], editMode: false});
+        } else{
+        console.warn('note with id ' + id + ' not found when trying to edit it');
+        }
     }
-  }
 
 
     openEditNote(id) {
