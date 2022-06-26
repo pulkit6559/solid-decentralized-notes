@@ -1,24 +1,24 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { Redirect } from 'react-router';
 import moment from 'moment';
 import nl2br from 'react-newline-to-break';
 
-import {getDefaultSession} from '@inrupt/solid-client-authn-browser'
+import { getDefaultSession } from '@inrupt/solid-client-authn-browser'
 
-const{
+const {
     deleteSolidDataset,
-}=require("@inrupt/solid-client");
+} = require("@inrupt/solid-client");
 
 class NoteView extends Component {
     constructor(props, context) {
         super(props, context);
-        this.state = { redirect : false};
+        this.state = { redirect: false };
 
         this.deleteNote = this.deleteNote.bind(this);
         this.editNote = this.editNote.bind(this);
     }
 
-    async deleteNoteAsync(note){
+    async deleteNoteAsync(note) {
         console.log("delte note ", note.title);
         let session = getDefaultSession();
         const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
@@ -31,7 +31,7 @@ class NoteView extends Component {
 
     deleteNote(event) {
         console.log('deleteNote');
-        this.deleteNoteAsync(this.props.note).then(ret=>{
+        this.deleteNoteAsync(this.props.note).then(ret => {
 
         }).catch(e => {
             console.log(e);
@@ -39,16 +39,16 @@ class NoteView extends Component {
         this.props.deleteNote(this.props.note.id);
     }
 
-    async editNoteAsync(note){
+    async editNoteAsync(note) {
         console.log("edit note ", this.props.note.title);
-        this.deleteNoteAsync(this.props.note).then(ret=>{
+        this.deleteNoteAsync(this.props.note).then(ret => {
 
         }).catch(e => {
             console.log(e);
         });
-    }   
+    }
 
-    editNote(event){
+    editNote(event) {
         event.preventDefault();
 
         this.props.editNote(this.props.note.id);
@@ -56,13 +56,13 @@ class NoteView extends Component {
     }
 
 
-    renderFormattedDate(){
+    renderFormattedDate() {
         return 'Last edited:' + moment(this.props.note.date).format("DD MMM YYYY [at] HH:mm");
     }
 
     render() {
         if (this.state.redirect || !this.props.note) {
-            return <Redirect to="/notes"/>;
+            return <Redirect to="/notes" />;
         }
 
         // if (this.state.redirect) {

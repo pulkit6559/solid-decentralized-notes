@@ -72,7 +72,8 @@ What can our system do:
 - Readfile
 - Policy framework
 - Revoking access for shared and public notes and adding this to the frontend
-- Frontend, list all own notes, all readable shared notes and all public notes 
+- Frontend, list all own notes, all readable shared notes and all public notes
+- Added functionality of "Edit Button" 
 
 
 ## Roadmap
@@ -87,6 +88,7 @@ Currently working on open issues:
 - n/a
 
 ## To-dos
+- Revoke Access for notes that are shared with friends 
 - Create final presentation
 - Create final poster
 - Clean code

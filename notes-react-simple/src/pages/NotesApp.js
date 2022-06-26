@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import moment from 'moment';
 import NoteForm from '../components/NoteForm';
 import NoteView from '../components/NoteView';
@@ -18,21 +18,21 @@ const {
     getStringWithLocale,
     getStringByLocaleAll,
     getUrlAll
-  } = require("@inrupt/solid-client");
+} = require("@inrupt/solid-client");
 
-const{
-FOAF,
-VCARD,
-RDF,
-SCHEMA_INRUPT
-}=require("@inrupt/vocab-common-rdf");
+const {
+    FOAF,
+    VCARD,
+    RDF,
+    SCHEMA_INRUPT
+} = require("@inrupt/vocab-common-rdf");
 
-import {getDefaultSession, Session, getSessionFromStorage } from '@inrupt/solid-client-authn-browser'
+import { getDefaultSession, Session, getSessionFromStorage } from '@inrupt/solid-client-authn-browser'
 
 
 async function format_request() {
     // const res = await axios.get('http://localhost:4444/readNote');
-    
+
     let session = getDefaultSession();
     const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
     const myDataset = await getSolidDataset(
@@ -48,56 +48,56 @@ async function format_request() {
     let dates = {};
 
     for (var key in def) {
-        if (key=="https://pod.inrupt.com/pulkit/Notesdump/"){
+        if (key == "https://pod.inrupt.com/pulkit/Notesdump/") {
             console.log("Skip");
         }
-        else{
+        else {
             console.log(key);
             let dataset = await getSolidDataset(
-            key,
-            { fetch: session.fetch }          // fetch from authenticated session
+                key,
+                { fetch: session.fetch }          // fetch from authenticated session
             );
             let arr_ = key.split("/");
-            let Name = arr_[arr_.length-1];
-            let thingName = key+"#"+Name;
+            let Name = arr_[arr_.length - 1];
+            let thingName = key + "#" + Name;
             let normal_date = "2022-05-30T09:33:56.543Z";
             console.log("THING: ", thingName);
             try {
-            let profile = getThing(
-                dataset,
-                thingName
-            );
-             console.log(profile);
-            let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
-            let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
-            //let name = getStringNoLocale(profile, SCHEMA_INRUPT.name);
-            console.log("****** ", Name, " ", description);
-            result[key] = profile;
-            name_description[Name] = description;
-            if (date == null){
-                dates[Name] = normal_date;
-            } else {
-                dates[Name] = date;
+                let profile = getThing(
+                    dataset,
+                    thingName
+                );
+                console.log(profile);
+                let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
+                let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
+                //let name = getStringNoLocale(profile, SCHEMA_INRUPT.name);
+                console.log("****** ", Name, " ", description);
+                result[key] = profile;
+                name_description[Name] = description;
+                if (date == null) {
+                    dates[Name] = normal_date;
+                } else {
+                    dates[Name] = date;
+                }
             }
-            }
-            catch (e){
-            console.log(e)
-            continue;
+            catch (e) {
+                console.log(e)
+                continue;
             }
         }
     }
     console.log("$$$$$$$$$$$$$$$$$$$: ", name_description);
-    
+
     let res = name_description;
     let all_notes = []
     let id = 1;
 
     let normal_date = "2022-05-30T09:33:56.543Z";
-    for (var title in res){
+    for (var title in res) {
         all_notes.push(
             {
-                'id':id,
-                'title':title,
+                'id': id,
+                'title': title,
                 'description': res[title],
                 'date': dates[title]
             }
@@ -107,115 +107,113 @@ async function format_request() {
     return all_notes
 }
 
-async function public_note(){
-  // const res = await axios.get('http://localhost:4444/readNote');
+async function public_note() {
+    // const res = await axios.get('http://localhost:4444/readNote');
 
-  let session = getDefaultSession();
-  const notes_url = "https://pod.inrupt.com/leslie/publicSolidPodFile/"
-  const myDataset = await getSolidDataset(
-    notes_url,
-    { fetch: session.fetch }          // fetch from authenticated session
-  );
-
-
-  let def = myDataset['graphs']['default'];
-
-  let result = {};
-  let name_description = {};
-  let all_notes = [];
-  let id = 1;
-
-  for (var key in def) {
-    if (key=="https://pod.inrupt.com/leslie/publicSolidPodFile/"){
-      console.log("Skip");
-    }
-    else{
-      console.log(key);
-      let dataset = await getSolidDataset(
-        key,
+    let session = getDefaultSession();
+    const notes_url = "https://pod.inrupt.com/leslie/publicSolidPodFile/"
+    const myDataset = await getSolidDataset(
+        notes_url,
         { fetch: session.fetch }          // fetch from authenticated session
-      );
-      let arr_ = key.split("/");
-      let Name = arr_[arr_.length-1];
-      let thingName = key+"#"+Name;
-      console.log("THING: ", thingName);
-      try {
-        let profile = getThing(
-          dataset,
-          thingName
-        );
-        console.log(profile);
-        let url = getStringNoLocale(profile, SCHEMA_INRUPT.text);
-        let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
-        let title = getStringNoLocale(profile, SCHEMA_INRUPT.description);
-        let name = getStringNoLocale(profile, SCHEMA_INRUPT.name);
-        console.log( " ", url);
+    );
 
-        let dataSet=undefined;
-        try {
-           dataSet = await getSolidDataset(
-            url,
-            {fetch: session.fetch}          // fetch from authenticated session
-          );
+
+    let def = myDataset['graphs']['default'];
+
+    let result = {};
+    let name_description = {};
+    let all_notes = [];
+    let id = 1;
+
+    for (var key in def) {
+        if (key == "https://pod.inrupt.com/leslie/publicSolidPodFile/") {
+            console.log("Skip");
         }
-        catch (e)
-        {
-          continue;
-        }
-        console.log("get the data",dataSet);
-        try{
-          let normal_date = "2022-05-29T09:33:56.543Z";   
-          let arr_ = url.split("/");
-          let Name = arr_[arr_.length-1];
-          let thingName = url+"#"+Name;
+        else {
+            console.log(key);
+            let dataset = await getSolidDataset(
+                key,
+                { fetch: session.fetch }          // fetch from authenticated session
+            );
+            let arr_ = key.split("/");
+            let Name = arr_[arr_.length - 1];
+            let thingName = key + "#" + Name;
+            console.log("THING: ", thingName);
+            try {
+                let profile = getThing(
+                    dataset,
+                    thingName
+                );
+                console.log(profile);
+                let url = getStringNoLocale(profile, SCHEMA_INRUPT.text);
+                let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
+                let title = getStringNoLocale(profile, SCHEMA_INRUPT.description);
+                let name = getStringNoLocale(profile, SCHEMA_INRUPT.name);
+                console.log(" ", url);
 
-          let profile = getThing(
-            dataSet,
-            thingName);
-          console.log("thing",profile)
-          let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
-          let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
-          console.log("description",description);
+                let dataSet = undefined;
+                try {
+                    dataSet = await getSolidDataset(
+                        url,
+                        { fetch: session.fetch }          // fetch from authenticated session
+                    );
+                }
+                catch (e) {
+                    continue;
+                }
+                console.log("get the data", dataSet);
+                try {
+                    let normal_date = "2022-05-29T09:33:56.543Z";
+                    let arr_ = url.split("/");
+                    let Name = arr_[arr_.length - 1];
+                    let thingName = url + "#" + Name;
 
-          if (date == null){
-              date = normal_date;
-          }
+                    let profile = getThing(
+                        dataSet,
+                        thingName);
+                    console.log("thing", profile)
+                    let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
+                    let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
+                    console.log("description", description);
 
-          all_notes.push(
-            {
-              'id':id,
-              'title':Name,
-              'description': description,
-              'date': date
+                    if (date == null) {
+                        date = normal_date;
+                    }
+
+                    all_notes.push(
+                        {
+                            'id': id,
+                            'title': Name,
+                            'description': description,
+                            'date': date
+                        }
+                    )
+                    id += 1
+                }
+                catch (e) {
+                    console.log("something is wrong")
+                    continue;
+                }
+
+                console.log("shared note", myDataset);
+                result[key] = profile;
+
             }
-          )
-          id+=1
+            catch (e) {
+                console.log(e)
+                continue;
+            }
         }
-        catch (e)
-        {
-          console.log("something is wrong")
-          continue;
-        }
-
-        console.log("shared note",myDataset);
-        result[key] = profile;
-
-      }
-      catch (e){
-        console.log(e)
-        continue;
-      }
     }
-  }
-  console.log("all_notes", all_notes);
-  return all_notes
+    console.log("all_notes", all_notes);
+    return all_notes
 }
 
-async function friends_note(){
+async function friends_note() {
     let session = getDefaultSession();
     let notes_url = "https://pod.inrupt.com/leslie/Users/pulkit/"
     let normal_date = "2022-05-31T09:33:56.543Z";
-    
+
     const myDataset = await getSolidDataset(
         notes_url,
         { fetch: session.fetch }          // fetch from authenticated session
@@ -228,54 +226,54 @@ async function friends_note(){
     let dates = {};
 
     for (var key in def) {
-        if (key=="https://pod.inrupt.com/leslie/Users/pulkit/"){
+        if (key == "https://pod.inrupt.com/leslie/Users/pulkit/") {
             console.log("Skip");
         }
-        else{
+        else {
             console.log(key);
             let dataset = await getSolidDataset(
-            key,
-            { fetch: session.fetch }          // fetch from authenticated session
+                key,
+                { fetch: session.fetch }          // fetch from authenticated session
             );
             let arr_ = key.split("/");
-            let Name = arr_[arr_.length-1];
-            let thingName = key+"#"+Name;
+            let Name = arr_[arr_.length - 1];
+            let thingName = key + "#" + Name;
             console.log("THING: ", thingName);
             try {
-            let profile = getThing(
-                dataset,
-                thingName
-            );
-            //console.log(profile);
-            let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
-            let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
-            //let name = getStringNoLocale(profile, SCHEMA_INRUPT.name)
-            console.log("****** ", Name, " ", description);
-            result[key] = profile;
-            name_description[Name] = description;
-            if (date == null){
-                dates[Name] = normal_date;
-            } else {
-                dates[Name] = date;
+                let profile = getThing(
+                    dataset,
+                    thingName
+                );
+                //console.log(profile);
+                let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
+                let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
+                //let name = getStringNoLocale(profile, SCHEMA_INRUPT.name)
+                console.log("****** ", Name, " ", description);
+                result[key] = profile;
+                name_description[Name] = description;
+                if (date == null) {
+                    dates[Name] = normal_date;
+                } else {
+                    dates[Name] = date;
+                }
             }
-            }
-            catch (e){
+            catch (e) {
                 console.log(e)
                 continue;
             }
         }
     }
     console.log("$$$$$$$$$$$$$$$$$$$: ", name_description);
-    
+
     let res = name_description;
     let friends_notes = []
     let id = 1;
 
-    for (var title in res){
+    for (var title in res) {
         friends_notes.push(
             {
-                'id':id,
-                'title':title,
+                'id': id,
+                'title': title,
                 'description': res[title],
                 'date': dates[title]
             }
@@ -296,38 +294,38 @@ class NotesApp extends Component {
 
         let all_notes = [];
         let friend_notes = [];
-        let public_notes=[];
-        
+        let public_notes = [];
+
         format_request().then(ret => {
             all_notes = ret;
-            console.log("Type of : localstorage",JSON.parse(localStorage.getItem('notes')));
+            console.log("Type of : localstorage", JSON.parse(localStorage.getItem('notes')));
             console.log("Type of : all_notes", all_notes);
-            this.setState({notes: all_notes})
+            this.setState({ notes: all_notes })
         }).catch(e => {
             console.log(e);
         });
 
         friends_note().then(ret => {
             friend_notes = ret;
-            console.log("Type of : localstorage",JSON.parse(localStorage.getItem('notes')));
+            console.log("Type of : localstorage", JSON.parse(localStorage.getItem('notes')));
             console.log("Type of : all_notes", friend_notes);
-            this.setState({friend_notes: friend_notes})
+            this.setState({ friend_notes: friend_notes })
         }).catch(e => {
             console.log(e);
         });
 
-        public_note().then(ret=>{
-          public_notes = ret;
-          console.log("Type of : localstorage",JSON.parse(localStorage.getItem('notes')));
-          console.log("Type of : all_notes", public_notes);
-          this.setState({public_notes: public_notes})
+        public_note().then(ret => {
+            public_notes = ret;
+            console.log("Type of : localstorage", JSON.parse(localStorage.getItem('notes')));
+            console.log("Type of : all_notes", public_notes);
+            this.setState({ public_notes: public_notes })
         }).catch(e => {
-          console.log(e);
+            console.log(e);
         })
-        
+
         // let notes = localStorage.getItem('notes') ? JSON.parse(localStorage.getItem('notes')) : [];
-        let notes = [all_notes, friend_notes,public_notes];
-        
+        let notes = [all_notes, friend_notes, public_notes];
+
         this.state = {
             notes: notes[0],
             friend_notes: notes[1],
@@ -344,7 +342,7 @@ class NotesApp extends Component {
         this.openEditNote = this.openEditNote.bind(this);
         this.saveEditedNote = this.saveEditedNote.bind(this);
         this.deleteNote = this.deleteNote.bind(this);
-        this.viewNote_PublicNote=this.viewNote_PublicNote.bind(this);
+        this.viewNote_PublicNote = this.viewNote_PublicNote.bind(this);
     }
 
     getNotesNextId() {
@@ -357,7 +355,7 @@ class NotesApp extends Component {
 
     persistNotes(notes) {
         // localStorage.setItem('notes', JSON.stringify(notes));
-        this.setState({notes: notes});
+        this.setState({ notes: notes });
     }
 
     addNote(note) {
@@ -368,34 +366,34 @@ class NotesApp extends Component {
         notes.push(note);
 
         this.persistNotes(notes);
-        this.setState({selectedNote: null, editMode: false});
+        this.setState({ selectedNote: null, editMode: false });
     }
 
     viewNote(id) {
         const notePosition = this.state.notes.findIndex((n) => n.id === id);
         if (notePosition >= 0) {
-            this.setState({selectedNote: this.state.notes[notePosition], editMode: false});
+            this.setState({ selectedNote: this.state.notes[notePosition], editMode: false });
         } else {
             console.warn('note with id ' + id + ' not found when trying to edit it');
         }
     }
 
-    viewNote_friendsnote(id){
+    viewNote_friendsnote(id) {
 
         const notePosition = this.state.friend_notes.findIndex((n) => n.id == id);
-        if (notePosition >= 0){
-            this.setState({selectedNote: this.state.friend_notes[notePosition], editMode: false});
-        } else{
+        if (notePosition >= 0) {
+            this.setState({ selectedNote: this.state.friend_notes[notePosition], editMode: false });
+        } else {
             console.warn('note with id ' + id + ' not found when trying to edit it');
         }
     }
 
-    viewNote_PublicNote(id){
+    viewNote_PublicNote(id) {
         const notePosition = this.state.public_notes.findIndex((n) => n.id === id);
-        if (notePosition >= 0){
-        this.setState({selectedNote: this.state.public_notes[notePosition], editMode: false});
-        } else{
-        console.warn('note with id ' + id + ' not found when trying to edit it');
+        if (notePosition >= 0) {
+            this.setState({ selectedNote: this.state.public_notes[notePosition], editMode: false });
+        } else {
+            console.warn('note with id ' + id + ' not found when trying to edit it');
         }
     }
 
@@ -403,7 +401,7 @@ class NotesApp extends Component {
     openEditNote(id) {
         const notePosition = this.state.notes.findIndex((n) => n.id === id);
         if (notePosition >= 0) {
-            this.setState({selectedNote: this.state.notes[notePosition], editMode: true});
+            this.setState({ selectedNote: this.state.notes[notePosition], editMode: true });
         } else {
             console.warn('note with id ' + id + ' not found when trying to open for edit');
         }
@@ -411,7 +409,7 @@ class NotesApp extends Component {
 
     saveEditedNote(note) {
         const notes = this.state.notes;
-        const notePosition = notes.findIndex((n)=> n.id === note.id);
+        const notePosition = notes.findIndex((n) => n.id === note.id);
 
         if (notePosition >= 0) {
             note.date = moment();
@@ -420,17 +418,17 @@ class NotesApp extends Component {
         } else {
             console.warn('note with id ' + note.id + ' not found when trying to save the edited note');
         }
-        this.setState({selectedNote: note, editMode: false});
+        this.setState({ selectedNote: note, editMode: false });
     }
 
     deleteNote(id) {
         const notes = this.state.notes;
-        const notePosition = notes.findIndex((n)=> n.id === id);
+        const notePosition = notes.findIndex((n) => n.id === id);
         if (notePosition >= 0) {
             if (window.confirm('Are you sure you want to delete this note?')) {
                 notes.splice(notePosition, 1);
                 this.persistNotes(notes);
-                this.setState({selectedNote: null, editMode: false});
+                this.setState({ selectedNote: null, editMode: false });
             }
         } else {
             console.warn('note with id ' + id + ' not found when trying to delete it');
@@ -444,12 +442,12 @@ class NotesApp extends Component {
         };
     }
 
-    renderLeftMenu () {
+    renderLeftMenu() {
         return (
             <div className="card">
                 {this.renderHeader()}
                 <div className="card-body">
-                    <NotesListMenu notes={this.state.notes} viewNote={this.viewNote}/>
+                    <NotesListMenu notes={this.state.notes} viewNote={this.viewNote} />
                 </div>
             </div>
         )
@@ -459,63 +457,63 @@ class NotesApp extends Component {
         return (
             <div className="card-header">
                 <Route exact path="/notes/note"
-                       render={routeProps => <Link to="/notes"><button type="button" className="btn btn-danger">Close Add Note Form</button></Link>}/>
+                    render={routeProps => <Link to="/notes"><button type="button" className="btn btn-danger">Close Add Note Form</button></Link>} />
                 {["/notes", "/notes/note/:id"].map(path =>
-                        <Route key={path} exact path={path}
-                               render={routeProps => <Link to="/notes/note"><button type="button" className="btn btn-success">Add Note</button></Link>}/>
+                    <Route key={path} exact path={path}
+                        render={routeProps => <Link to="/notes/note"><button type="button" className="btn btn-success">Add Note</button></Link>} />
                 )}
             </div>
         )
     }
 
 
-    renderRightMenu () {
+    renderRightMenu() {
         return (
             <div className="card">
                 {this.renderFriendSharedNoteHeader()}
                 <div className="card-body">
-                    <NotesListMenu notes={this.state.friend_notes} viewNote={this.viewNote_friendsnote}/>
+                    <NotesListMenu notes={this.state.friend_notes} viewNote={this.viewNote_friendsnote} />
                 </div>
             </div>
         )
-      }
-
-  renderPublicNotes() {
-    return (
-      <div className="card">
-        {this.renderFriendSharedNoteHeader()}
-        <div className="card-body">
-          <NotesListMenu notes={this.state.public_notes} viewNote={this.viewNote_PublicNote}/>
-        </div>
-      </div>
-    )
-  }
-  
-  
-  
-    renderFriendSharedNoteHeader() {
-    return (
-        <div className="card-header">
-            <h5 class="card-title">Shared Notes by Friends</h5>
-        </div>
-    )
     }
-  
+
+    renderPublicNotes() {
+        return (
+            <div className="card">
+                {this.renderFriendSharedNoteHeader()}
+                <div className="card-body">
+                    <NotesListMenu notes={this.state.public_notes} viewNote={this.viewNote_PublicNote} />
+                </div>
+            </div>
+        )
+    }
+
+
+
+    renderFriendSharedNoteHeader() {
+        return (
+            <div className="card-header">
+                <h5 class="card-title">Shared Notes by Friends</h5>
+            </div>
+        )
+    }
+
     setMainAreaRoutes() {
         const editMode = this.state.editMode;
         return (<div>
             {editMode ? (
-                <Route  path="/notes/note/:id"
-                       render={routeProps =>  <NoteForm persistNote={this.saveEditedNote} deleteNote={this.deleteNote} note={this.state.selectedNote}/>}
-                    />
+                <Route path="/notes/note/:id"
+                    render={routeProps => <NoteForm persistNote={this.saveEditedNote} deleteNote={this.deleteNote} note={this.state.selectedNote} />}
+                />
             ) : (
                 <Route path="/notes/note/:id"
-                       render={routeProps =>  <NoteView editNote={this.openEditNote} deleteNote={this.deleteNote} note={this.state.selectedNote}/>}
-                    />
+                    render={routeProps => <NoteView editNote={this.openEditNote} deleteNote={this.deleteNote} note={this.state.selectedNote} />}
+                />
             )}
             <Route exact path="/notes/note"
-                   render={routeProps =>  <NoteForm persistNote={this.addNote} note={this.getEmptyNote()}/>}
-                />
+                render={routeProps => <NoteForm persistNote={this.addNote} note={this.getEmptyNote()} />}
+            />
         </div>)
     }
 
@@ -531,10 +529,10 @@ class NotesApp extends Component {
                         {this.renderRightMenu()}
                     </div>
 
-                  <div className="col-md-3">
-                    {this.renderPublicNotes()}
-                  </div>
-                    
+                    <div className="col-md-3">
+                        {this.renderPublicNotes()}
+                    </div>
+
                     <div className="col-md-9">
                         {this.setMainAreaRoutes()}
                     </div>
