@@ -7,6 +7,7 @@ import { getDefaultSession } from '@inrupt/solid-client-authn-browser'
 
 const {
     deleteSolidDataset,
+    access
 } = require("@inrupt/solid-client");
 
 class NoteView extends Component {
@@ -16,6 +17,7 @@ class NoteView extends Component {
 
         this.deleteNote = this.deleteNote.bind(this);
         this.editNote = this.editNote.bind(this);
+        this.revokeAccess = this.revokeAccess.bind(this);
     }
 
     async deleteNoteAsync(note) {
@@ -55,6 +57,26 @@ class NoteView extends Component {
         this.editNoteAsync(this.props.note);
     }
 
+    async revokeAccessAsync(){
+        let session = getDefaultSession();
+        const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
+        await access.setAgentAccess(
+            notes_url + this.props.note.title,
+            'https://pod.inrupt.com/' + this.userWebId + '/profile/card#me',
+            { read: false, write: false, append: false },
+            { fetch: session.fetch },
+        );
+
+    }
+
+    revokeAccess(event){
+        event.preventDefault();
+        this.revokeAccessAsync().then(ret => {
+            console.log(ret);
+        }).catch(e => {
+            console.log(e);
+        });
+    }
 
     renderFormattedDate() {
         return 'Last edited:' + moment(this.props.note.date).format("DD MMM YYYY [at] HH:mm");
@@ -83,6 +105,11 @@ class NoteView extends Component {
                     <p className="card-text">{nl2br(this.props.note.description)}</p>
                     <button onClick={this.deleteNote} className="btn btn-danger">Delete Note</button>
                     <button onClick={this.editNote} className="btn btn-success float-right">Edit Note</button>
+
+                    <input className="form-control" ref={userWebId => this.userWebId = userWebId}
+                                defaultValue={this.props.note.userWebId}
+                                placeholder="enter user WebId" />
+                    <button onClick={this.revokeAccess} className="btn btn-danger">Revoke Access</button>
                 </div>
             </div>
         )
