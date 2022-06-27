@@ -180,6 +180,17 @@ app.get("/readAllNotes", async (req, res) => {
 });
 
 app.post("/storetoPublicPod", async (req, res) => {
+
+  // verify the user
+  if (app.locals.userCodeStore[req.body.user_name] == req.body.auth){
+    print("Request Authenticated for user: ", req.body.user_name)
+  }
+  else{
+    return res.status(400).send({
+      message: 'Invalid Auth Code!'
+   });
+  }
+
   const session = app.locals.session;
   let courseSolidDataset = createSolidDataset();
   //req tansfer the name of the file and its id. the prefix should be decided accourding to different user
@@ -188,7 +199,6 @@ app.post("/storetoPublicPod", async (req, res) => {
     .build();
 
   courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
-  // courseSolidDataset2 = setThing(courseSolidDataset2, newTextThing2);
 
   const savedSolidDataset = await saveSolidDatasetAt(
     "https://pod.inrupt.com/leslie/publicSolidPodFile/" + req.body.title,
@@ -231,6 +241,17 @@ app.get("/giveAccessTo", async (req, res) => {
 
 
 app.post("/shareWithWebID", async (req, res) => {
+
+  // verify the user
+  if (app.locals.userCodeStore[req.body.user_name] == req.body.auth){
+    print("Request Authenticated for user: ", req.body.user_name)
+  }
+  else{
+    return res.status(400).send({
+      message: 'Invalid Auth Code!'
+    });
+  }
+
   const session = app.locals.session;
   console.log("SHARING: ", req.body)
 
