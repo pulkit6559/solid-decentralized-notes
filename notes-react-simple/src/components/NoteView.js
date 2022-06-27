@@ -10,6 +10,7 @@ const {
     setThing,
     saveSolidDatasetAt,
     addStringNoLocale
+
 } = require("@inrupt/solid-client");
 
 import { getDefaultSession } from '@inrupt/solid-client-authn-browser'
@@ -48,7 +49,6 @@ class NoteView extends Component {
 
     async editNoteAsync(note) {
 
-
         //this.deleteNoteAsync(this.props.note).then(ret => {
 
         //}).catch(e => {
@@ -62,7 +62,7 @@ class NoteView extends Component {
         event.preventDefault();
 
         this.props.editNote(this.props.note.id);
-        //this.editNoteAsync(this.props.note);
+       // this.editNoteAsync(this.props.note);
     }
 
 
