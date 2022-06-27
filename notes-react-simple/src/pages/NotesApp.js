@@ -481,7 +481,7 @@ class NotesApp extends Component {
     renderPublicNotes() {
         return (
             <div className="card">
-                {this.renderFriendSharedNoteHeader()}
+                {this.renderPublicNoteHeader()}
                 <div className="card-body">
                     <NotesListMenu notes={this.state.public_notes} viewNote={this.viewNote_PublicNote} />
                 </div>
@@ -490,6 +490,13 @@ class NotesApp extends Component {
     }
 
 
+    renderPublicNoteHeader() {
+        return (
+            <div className="card-header">
+                <h5 class="card-title">Public Notes</h5>
+            </div>
+        )
+    }
 
     renderFriendSharedNoteHeader() {
         return (

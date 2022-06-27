@@ -9,7 +9,9 @@ const {
     buildThing,
     setThing,
     createSolidDataset,
-    access
+    access,
+    getSolidDataset,
+    getThing
 } = require("@inrupt/solid-client");
 
 const {
@@ -113,7 +115,24 @@ class NoteForm extends Component {
 
                 }
             }).catch(e => {
-                console.log(e);
+                let session = getDefaultSession();
+                console.log("edit note ", this.props.note.title);
+                let resourceURL = "https://pod.inrupt.com/pulkit/Notesdump/"
+                let authCodeDataset = getSolidDataset(
+                    resourceURL + this.props.note.title + '#' + this.props.note.title,
+                    { fetch: session.fetch }
+                );
+                console.log(resourceURL + this.props.note.title + "#" + this.props.note.title);
+                let authThing = getThing(authCodeDataset, resourceURL + this.props.note.title + "#" + this.props.note.title);
+                let new_description = setStringNoLocale(authThing, SCHEMA_INRUPT.description, note.description);
+                authCodeDataset = setThing(authCodeDataset, authThing);
+                console.log(authCodeDataset);
+
+                const savedSolidDataset = saveSolidDatasetAt(
+                    resourceURL + this.props.note.title,
+                    authCodeDataset,
+                    { fetch: session.fetch }             // fetch from authenticated Session
+                );
             });
 
 
