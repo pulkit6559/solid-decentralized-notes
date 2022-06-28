@@ -12,6 +12,7 @@ const {
     getSolidDataset,
     getThing,
     getStringNoLocale,
+    setStringNoLocale,
     access
 } = require("@inrupt/solid-client");
 
@@ -122,6 +123,29 @@ class NoteForm extends Component {
 
     }
 
+
+    async edit_note(note) {
+        let session = getDefaultSession();
+        console.log("edit note ", this.props.note.title);
+        let resourceURL = "https://pod.inrupt.com/pulkit/Notesdump/"
+        let editedDataset = await getSolidDataset(
+            resourceURL + this.props.note.title + "#" + this.props.note.title,
+            { fetch: session.fetch }
+        );
+        console.log("EditedDataset is ", editedDataset);
+        let editThing = getThing(editedDataset, resourceURL + this.props.note.title + "#" + this.props.note.title);
+        console.log("EditThing is this", editThing);
+        editThing = setStringNoLocale(editThing, SCHEMA_INRUPT.description, note.description);
+        editedDataset = setThing(editedDataset, editThing);
+
+        const savedSolidDataset = saveSolidDatasetAt(
+            resourceURL + this.props.note.title,
+            editedDataset,
+            { fetch: session.fetch }             // fetch from authenticated Session
+        );
+    }
+
+
     saveNote(event) {
         event.preventDefault();
         if (this.title.value === "") {
@@ -146,7 +170,7 @@ class NoteForm extends Component {
 
                 }
             }).catch(e => {
-                console.log(e);
+                this.edit_note(note);
             });
 
 

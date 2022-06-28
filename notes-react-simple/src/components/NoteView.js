@@ -2,22 +2,20 @@ import React, { Component } from 'react';
 import { Redirect } from 'react-router';
 import moment from 'moment';
 import nl2br from 'react-newline-to-break';
-
-import { getDefaultSession } from '@inrupt/solid-client-authn-browser'
-
 const {
-    deleteSolidDataset,
     getSolidDataset,
     getThing,
+    setStringNoLocale,
+    deleteSolidDataset,
+    setThing,
+    saveSolidDatasetAt,
+    addStringNoLocale,
     getStringNoLocale,
     access
 } = require("@inrupt/solid-client");
 
-const {
-    RDF,
-    SCHEMA_INRUPT
-} = require("@inrupt/vocab-common-rdf");
-
+import { getDefaultSession } from '@inrupt/solid-client-authn-browser'
+import { SCHEMA_INRUPT } from '@inrupt/vocab-common-rdf';
 var axios = require('axios')
 
 
@@ -63,7 +61,7 @@ class NoteView extends Component {
 
 
     async deleteNoteAsync(note) {
-        console.log("delte note ", note.title);
+        console.log("delete note ", note.title);
         let session = getDefaultSession();
         const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/"
 
@@ -84,19 +82,21 @@ class NoteView extends Component {
     }
 
     async editNoteAsync(note) {
-        console.log("edit note ", this.props.note.title);
-        this.deleteNoteAsync(this.props.note).then(ret => {
 
-        }).catch(e => {
-            console.log(e);
-        });
+        //this.deleteNoteAsync(this.props.note).then(ret => {
+
+        //}).catch(e => {
+        //    console.log(e);
+        //});
+
+
     }
 
     editNote(event) {
         event.preventDefault();
 
         this.props.editNote(this.props.note.id);
-        this.editNoteAsync(this.props.note);
+       // this.editNoteAsync(this.props.note);
     }
 
     async revokeAccessAsync(){
