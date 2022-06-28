@@ -182,10 +182,12 @@ app.get("/readAllNotes", async (req, res) => {
 app.post("/storetoPublicPod", async (req, res) => {
 
   // verify the user
-  if (app.locals.userCodeStore[req.body.user_name] == req.body.auth){
-    print("Request Authenticated for user: ", req.body.user_name)
+  console.log(req.body.user_card, app.locals.userCodeStore[req.body.user_name])
+  if (app.locals.userCodeStore[req.body.user_card] == req.body.auth){
+    console.log("Request Authenticated for user: ", req.body.user_name)
   }
   else{
+    console.log("Not authenticated")
     return res.status(400).send({
       message: 'Invalid Auth Code!'
    });
@@ -243,10 +245,11 @@ app.get("/giveAccessTo", async (req, res) => {
 app.post("/shareWithWebID", async (req, res) => {
 
   // verify the user
-  if (app.locals.userCodeStore[req.body.user_name] == req.body.auth){
-    print("Request Authenticated for user: ", req.body.user_name)
+  if (app.locals.userCodeStore[req.body.user_card] == req.body.auth){
+    console.log("Request Authenticated for user: ", req.body.user_name)
   }
   else{
+    console.log("Not authenticated")
     return res.status(400).send({
       message: 'Invalid Auth Code!'
     });
