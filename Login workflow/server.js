@@ -27,6 +27,7 @@ const{
   buildThing,
   setThing,
   createSolidDataset,
+  deleteSolidDataset,
   access
 }=require("@inrupt/solid-client");
 const{
@@ -296,6 +297,54 @@ app.post("/shareWithWebID", async (req, res) => {
   res.send("Added access to file for leslie")
 });
 
+app.post("/revokeFriendAccess", async (req, res) => {
+
+  // verify the user
+  if (app.locals.userCodeStore[req.body.user_card] == req.body.auth){
+    console.log("Request Authenticated for user: ", req.body.user_name)
+  }
+  else{
+    console.log("Not authenticated")
+    return res.status(400).send({
+      message: 'Invalid Auth Code!'
+    });
+  }
+
+  note_data = req.body;
+
+  const session = app.locals.session;
+
+  let reference_title = note_data.user_name + '_' + note_data.title + '_ref';
+
+  const note_ref_url = "https://pod.inrupt.com/leslie/Users/" + 
+                        note_data.friendWebID + "/" + reference_title;
+  
+
+  let sharedNoteDataset = await getSolidDataset(
+      note_ref_url,
+      { fetch: session.fetch }
+    );
+
+  let sharedNoteThing = getThing(
+    sharedNoteDataset,
+    note_ref_url + "#" + reference_title
+  );
+
+  let noteURL = getStringNoLocale(sharedNoteThing, SCHEMA_INRUPT.text);
+
+  if (noteURL.includes(note_data.user_name)){
+    const savedSolidDataset = await deleteSolidDataset(
+      note_ref_url,
+      { fetch: session.fetch }       
+    );
+    console.log("Reference succesfully deleted")
+  }
+  else{
+    console.log("The reference does not belong to the current user")
+  }
+
+})
+
 
 // this reads the content of the note
 app.get("/readNote", async (req, res) => {
@@ -342,10 +391,7 @@ app.get("/readNote", async (req, res) => {
       catch (e){
         continue;
       }
-
-      // res.send(dataset);
     }
-
   }
 
   res.send(name_description);
