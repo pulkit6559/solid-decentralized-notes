@@ -7,8 +7,19 @@ import { getDefaultSession } from '@inrupt/solid-client-authn-browser'
 
 const {
     deleteSolidDataset,
+    getSolidDataset,
+    getThing,
+    getStringNoLocale,
     access
 } = require("@inrupt/solid-client");
+
+const {
+    RDF,
+    SCHEMA_INRUPT
+} = require("@inrupt/vocab-common-rdf");
+
+var axios = require('axios')
+
 
 class NoteView extends Component {
     constructor(props, context) {
@@ -18,7 +29,38 @@ class NoteView extends Component {
         this.deleteNote = this.deleteNote.bind(this);
         this.editNote = this.editNote.bind(this);
         this.revokeAccess = this.revokeAccess.bind(this);
+
+        this.readAuthCode = this.readAuthCode.bind(this);
+        this.readAuthCode().then(ret => {
+            this.userAuth = ret
+            console.log(ret)
+        }).catch(e => {
+            console.log("READING CODE ############# error")
+            console.log(e);
+        });
     }
+
+    async readAuthCode() {
+        let session = getDefaultSession();
+        const code_url = "https://pod.inrupt.com/pulkit/notesAuth/code"
+
+        let authCodeDataset = await getSolidDataset(
+            code_url,
+            { fetch: session.fetch }
+          );
+
+          let codeThing = getThing(
+            authCodeDataset,
+            code_url + "#code"
+        );
+
+        let code = getStringNoLocale(codeThing, SCHEMA_INRUPT.accessCode);
+
+        console.log("READING CODE ############# ", code)
+
+        return code
+    }
+
 
     async deleteNoteAsync(note) {
         console.log("delte note ", note.title);
@@ -72,10 +114,27 @@ class NoteView extends Component {
     revokeAccess(event){
         event.preventDefault();
         this.revokeAccessAsync().then(ret => {
-            console.log(ret);
+            let note_ref = {
+                user_card: "https://pod.inrupt.com/pulkit/profile/card#me",
+                user_name: "pulkit",
+                friendWebID: this.userWebId.value,
+                noteURL: "https://pod.inrupt.com/pulkit/Notesdump/" + this.props.note.title,
+                title: this.props.note.title,
+                auth: this.userAuth
+            }
+    
+            // call the backend to remove reference of shared note
+            axios
+                .post('http://localhost:4444/revokeFriendAccess', note_ref)
+                .then(() => console.log('note shared'))
+                .catch(err => {
+                    console.log(err);
+                });
+            
         }).catch(e => {
             console.log(e);
         });
+
     }
 
     renderFormattedDate() {
