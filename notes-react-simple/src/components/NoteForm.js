@@ -9,10 +9,11 @@ const {
     buildThing,
     setThing,
     createSolidDataset,
-    access,
     getSolidDataset,
     getThing,
-    setStringNoLocale
+    getStringNoLocale,
+    setStringNoLocale,
+    access
 } = require("@inrupt/solid-client");
 
 const {
@@ -34,6 +35,35 @@ class NoteForm extends Component {
         this.saveNote = this.saveNote.bind(this);
         // this.deleteNote = this.deleteNote.bind(this);
         this.shareNote = this.shareNote.bind(this);
+        this.readAuthCode = this.readAuthCode.bind(this);
+        this.readAuthCode().then(ret => {
+            this.userAuth = ret
+            console.log(ret)
+        }).catch(e => {
+            console.log("READING CODE ############# error")
+            console.log(e);
+        });
+    }
+
+    async readAuthCode() {
+        let session = getDefaultSession();
+        const code_url = "https://pod.inrupt.com/pulkit/notesAuth/code"
+
+        let authCodeDataset = await getSolidDataset(
+            code_url,
+            { fetch: session.fetch }
+          );
+
+          let codeThing = getThing(
+            authCodeDataset,
+            code_url + "#code"
+        );
+
+        let code = getStringNoLocale(codeThing, SCHEMA_INRUPT.accessCode);
+
+        console.log("READING CODE ############# ", code)
+
+        return code
     }
 
     async addNote(note) {
@@ -79,7 +109,8 @@ class NoteForm extends Component {
             friend_card: friendWebID,
             friend_name: friendName,
             noteURL: "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
-            title: note.title
+            title: note.title,
+            auth: this.userAuth
         }
 
         axios
@@ -205,7 +236,8 @@ class NoteForm extends Component {
                 user_card: "https://pod.inrupt.com/pulkit/profile/card#me",
                 user_name: "pulkit",
                 noteURL: "https://pod.inrupt.com/pulkit/Notesdump/" + note.title,
-                title: note.title
+                title: note.title,
+                auth: this.userAuth
             }
             // call the backend to save reference to public note
             axios
