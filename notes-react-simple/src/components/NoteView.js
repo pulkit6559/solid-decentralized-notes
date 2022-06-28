@@ -10,8 +10,6 @@ const {
     setThing,
     saveSolidDatasetAt,
     addStringNoLocale,
-    getSolidDataset,
-    getThing,
     getStringNoLocale,
     access
 } = require("@inrupt/solid-client");
