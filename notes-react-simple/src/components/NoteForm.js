@@ -71,7 +71,7 @@ class NoteForm extends Component {
 
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, "0");
-    var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+    var mm = String(today.getMonth() + 1).padStart(2, "0");
     var yyyy = today.getFullYear();
 
     today = mm + "/" + dd + "/" + yyyy;
@@ -133,12 +133,26 @@ class NoteForm extends Component {
       resourceURL + this.props.note.title + "#" + this.props.note.title
     );
     console.log("EditThing is this", editThing);
-    editThing = setStringNoLocale(
+    let editThing_1 = setStringNoLocale(
       editThing,
       SCHEMA_INRUPT.description,
       note.description
     );
-    editedDataset = setThing(editedDataset, editThing);
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, "0");
+    var mm = String(today.getMonth() + 1).padStart(2, "0");
+    var yyyy = today.getFullYear();
+
+    today = mm + "/" + dd + "/" + yyyy;
+    
+    let editThing_2 = setStringNoLocale(
+      editThing,
+      SCHEMA_INRUPT.endDate,
+      today
+    );
+
+    editedDataset = setThing(editedDataset, editThing_1);
+    editedDataset = setThing(editedDataset, editThing_2);
 
     const savedSolidDataset = saveSolidDatasetAt(
       resourceURL + this.props.note.title,
@@ -158,6 +172,7 @@ class NoteForm extends Component {
         title: this.title.value,
         userWebId: this.userWebId.value,
         description: this.description.value,
+        date: this.endDate
       };
 
       this.addNote(note)
@@ -176,15 +191,9 @@ class NoteForm extends Component {
           }
         })
         .catch((e) => {
+          console.log("Date ", note.date)
           this.edit_note(note);
         });
-
-      // axios
-      // .post('http://localhost:4444/reactNote', note)
-      // .then(() => console.log('Book Created'))
-      // .catch(err => {
-      //   console.error(err);
-      // });
 
       this.props.persistNote(note);
       this.setState({ redirect: true });
