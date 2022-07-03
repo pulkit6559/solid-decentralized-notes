@@ -92,9 +92,9 @@ class NoteForm extends Component {
     );
   }
 
-  async shareWithFriend(note, friendWebID, friendName,selectedWriting,selectedReading) {
+  async shareWithFriend(note, friendWebID, friendName, selectedWriting, selectedReading) {
     let session = getDefaultSession();
-    console.log(document.getElementById("writing"),document.getElementById("reading"))
+    console.log(document.getElementById("writing"), document.getElementById("reading"))
     await access.setAgentAccess(
       this.baseUrl + "/Notesdump/" + note.title,
       friendWebID,
@@ -133,27 +133,15 @@ class NoteForm extends Component {
       editedDataset,
       resourceURL + this.props.note.title + "#" + this.props.note.title
     );
+
     console.log("EditThing is this", editThing);
-    let editThing_1 = setStringNoLocale(
+    editThing = setStringNoLocale(
       editThing,
       SCHEMA_INRUPT.description,
       note.description
     );
-    var today = new Date();
-    var dd = String(today.getDate()).padStart(2, "0");
-    var mm = String(today.getMonth() + 1).padStart(2, "0");
-    var yyyy = today.getFullYear();
 
-    today = mm + "/" + dd + "/" + yyyy;
-    
-    let editThing_2 = setStringNoLocale(
-      editThing,
-      SCHEMA_INRUPT.endDate,
-      today
-    );
-
-    editedDataset = setThing(editedDataset, editThing_1);
-    editedDataset = setThing(editedDataset, editThing_2);
+    editedDataset = setThing(editedDataset, editThing);
 
     const savedSolidDataset = saveSolidDatasetAt(
       resourceURL + this.props.note.title,
@@ -162,141 +150,119 @@ class NoteForm extends Component {
     );
   }
 
-  saveNote(event) {
-    event.preventDefault();
-    if (this.title.value === "") {
-      alert("Title is needed");
-    } else {
-      this.id.value = this.id.value + 1;
-      const note = {
-        id: Number(this.id.value),
-        title: this.title.value,
-        userWebId: this.userWebId.value,
-        description: this.description.value,
-        date: this.endDate
-      };
 
-      this.addNote(note)
-        .then((ret) => {
-          if (!(note.userWebId === "")) {
-            console.log("SHARING WITH USER");
-            this.shareWithFriend(
-              note,
-              "https://pod.inrupt.com/" + note.userWebId + "/profile/card#me",
-              note.userWebId,
-              this.selectedWriting,
-              this.selectedReading
-            )
-              .then((ret) => {})
-              .catch((e) => {
-                console.log(e);
-              });
-          }
-        })
-        .catch((e) => {
-          console.log("Date ", note.date)
-          this.edit_note(note);
-        });
+saveNote(event) {
+  event.preventDefault();
+  if (this.title.value === "") {
+    alert("Title is needed");
+  } else {
+    this.id.value = this.id.value + 1;
+    const note = {
+      id: Number(this.id.value),
+      title: this.title.value,
+      userWebId: this.userWebId.value,
+      description: this.description.value,
+      date: this.endDate
+    };
 
-      this.props.persistNote(note);
-      this.setState({ redirect: true });
-    }
+    this.addNote(note)
+      .then((ret) => {
+        if (!(note.userWebId === "")) {
+          console.log("SHARING WITH USER");
+          this.shareWithFriend(
+            note,
+            "https://pod.inrupt.com/" + note.userWebId + "/profile/card#me",
+            note.userWebId,
+            this.selectedWriting,
+            this.selectedReading
+          )
+            .then((ret) => { })
+            .catch((e) => {
+              console.log(e);
+            });
+        }
+      })
+      .catch((e) => {
+        this.edit_note(note);
+      });
+
+    this.props.persistNote(note);
+    this.setState({ redirect: true });
   }
+}
 
   async shareNoteAsync(note) {
-    let session = getDefaultSession();
-    const notes_url = this.baseUrl + "/Notesdump/";
-    let courseSolidDataset = createSolidDataset();
+  let session = getDefaultSession();
+  const notes_url = this.baseUrl + "/Notesdump/";
+  let courseSolidDataset = createSolidDataset();
 
-    const newBookThing1 = buildThing(createThing({ name: note.title }))
-      .addStringNoLocale(SCHEMA_INRUPT.name, "react generated note")
-      .addStringNoLocale(SCHEMA_INRUPT.description, note.description)
-      .addStringNoLocale(SCHEMA_INRUPT.text, note.description)
-      .addUrl(RDF.type, "https://schema.org/TextDigitalDocument")
-      .build();
+  const newBookThing1 = buildThing(createThing({ name: note.title }))
+    .addStringNoLocale(SCHEMA_INRUPT.name, "react generated note")
+    .addStringNoLocale(SCHEMA_INRUPT.description, note.description)
+    .addStringNoLocale(SCHEMA_INRUPT.text, note.description)
+    .addUrl(RDF.type, "https://schema.org/TextDigitalDocument")
+    .build();
 
-    courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
+  courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
 
-    const savedSolidDataset = await saveSolidDatasetAt(
-      this.baseUrl + "/Notesdump/" + note.title,
-      courseSolidDataset,
-      { fetch: session.fetch } // fetch from authenticated Session
-    );
+  const savedSolidDataset = await saveSolidDatasetAt(
+    this.baseUrl + "/Notesdump/" + note.title,
+    courseSolidDataset,
+    { fetch: session.fetch } // fetch from authenticated Session
+  );
 
-    await access.setPublicAccess(
-      this.baseUrl + "/Notesdump/" + note.title,
-      { read: true, write: false, append: false },
-      { fetch: session.fetch }
-    );
+  await access.setPublicAccess(
+    this.baseUrl + "/Notesdump/" + note.title,
+    { read: true, write: false, append: false },
+    { fetch: session.fetch }
+  );
+}
+
+shareNote(event) {
+  event.preventDefault();
+  if (this.title.value === "") {
+    alert("Title is needed");
+  } else {
+    this.id.value = this.id.value + 1;
+    const note = {
+      id: Number(this.id.value),
+      title: this.title.value,
+      description: this.description.value,
+    };
+
+    this.shareNoteAsync(note)
+      .then((ret) => { })
+      .catch((e) => {
+        console.log(e);
+      });
+
+    let note_ref = {
+      user_card: this.baseUrl + "/profile/card#me",
+      user_name: this.username,
+      noteURL: this.baseUrl + "/Notesdump/" + note.title,
+      title: note.title,
+      auth: this.userAuth,
+    };
+    // call the backend to save reference to public note
+    axios
+      .post("http://localhost:4444/storetoPublicPod", note_ref)
+      .then(() => console.log("node shared"))
+      .catch((err) => {
+        console.error(err);
+      });
+    this.props.persistNote(note);
   }
+}
 
-  shareNote(event) {
-    event.preventDefault();
-    if (this.title.value === "") {
-      alert("Title is needed");
-    } else {
-      this.id.value = this.id.value + 1;
-      const note = {
-        id: Number(this.id.value),
-        title: this.title.value,
-        description: this.description.value,
-      };
+renderFormTitleAction() {
+  return this.props.note.id !== undefined ? "Edit Note" : "Add Note";
+}
 
-      this.shareNoteAsync(note)
-        .then((ret) => {})
-        .catch((e) => {
-          console.log(e);
-        });
-
-      let note_ref = {
-        user_card: this.baseUrl + "/profile/card#me",
-        user_name: this.username,
-        noteURL: this.baseUrl + "/Notesdump/" + note.title,
-        title: note.title,
-        auth: this.userAuth,
-      };
-      // call the backend to save reference to public note
-      axios
-        .post("http://localhost:4444/storetoPublicPod", note_ref)
-        .then(() => console.log("node shared"))
-        .catch((err) => {
-          console.error(err);
-        });
-      this.props.persistNote(note);
-    }
-  }
-
-  renderFormTitleAction() {
-    return this.props.note.id !== undefined ? "Edit Note" : "Add Note";
-  }
-
-  renderFormButtons() {
-    if (this.props.note.id !== undefined) {
-      return (
-        <div>
-          {/* <button type="makePublic" className="btn btn-success float-right">Save Note (Public)</button> */}
-          <button
-            type="submit"
-            onClick={this.saveNote}
-            className="btn btn-success float-right"
-          >
-            Save Note
-          </button>
-          <button onClick={this.deleteNote} className="btn btn-danger">
-            Delete Note
-          </button>
-        </div>
-      );
-    }
+renderFormButtons() {
+  if (this.props.note.id !== undefined) {
     return (
       <div>
-        <button
-          type="makePublic"
-          onClick={this.shareNote}
-          className="btn btn-success float-left"
-        >
-          Save Note (Public)
-        </button>
+        {/* <button type="makePublic" className="btn btn-success float-right">Save Note (Public)</button> */}
         <button
           type="submit"
           onClick={this.saveNote}
@@ -304,79 +270,101 @@ class NoteForm extends Component {
         >
           Save Note
         </button>
+        <button onClick={this.deleteNote} className="btn btn-danger">
+          Delete Note
+        </button>
       </div>
     );
   }
+  return (
+    <div>
+      <button
+        type="makePublic"
+        onClick={this.shareNote}
+        className="btn btn-success float-left"
+      >
+        Save Note (Public)
+      </button>
+      <button
+        type="submit"
+        onClick={this.saveNote}
+        className="btn btn-success float-right"
+      >
+        Save Note
+      </button>
+    </div>
+  );
+}
 
-  render() {
-    if (this.state.redirect) {
-      if (!this.props.note) {
-        return <Redirect exact to="/notes/" />;
-      }
-
-      return <Redirect to={`/home`} />;
-
-      // return <Redirect push to={`/notes/`}/>;
+render() {
+  if (this.state.redirect) {
+    if (!this.props.note) {
+      return <Redirect exact to="/notes/" />;
     }
-    return (
-      <div className="card">
-        <div className="card-header">{this.renderFormTitleAction()}</div>
-        <div className="card-body">
-          <form ref="noteForm" onSubmit={this.saveNote}>
-            <div className="form-group">
-              <p>
-                <input
-                  className="form-control"
-                  style={divStyle}
-                  disabled
-                  ref={(id) => (this.id = id)}
-                  defaultValue={this.props.note.id}
-                />
-              </p>
 
-              <p>
-                <input
-                  className="form-control"
-                  ref={(title) => (this.title = title)}
-                  defaultValue={this.props.note.title}
-                  placeholder="enter title"
-                />
-              </p>
-              <p>
-                <input
-                  className="form-control"
-                  ref={(userWebId) => (this.userWebId = userWebId)}
-                  defaultValue={this.props.note.userWebId}
-                  placeholder="enter user WebId"
-                />
-              </p>
+    return <Redirect to={`/home`} />;
 
-               <p>
-                 <input type="checkbox" id="writing" value="on" ref={(selectedWriting)=>this.selectedWriting=selectedWriting} />
-                 <label htmlFor="writing"> sharing with writing access </label>
-
-
-                 <input type="checkbox" id="reading" value="on" ref={(selectedReading)=>this.selectedReading=selectedReading} />
-                 <label htmlFor="reading"> sharing with reading access </label>
-               </p>
-
-
-              <p>
-                <textarea
-                  className="form-control"
-                  rows="10"
-                  ref={(description) => (this.description = description)}
-                  defaultValue={this.props.note.description}
-                  placeholder="enter description"
-                />
-              </p>
-            </div>
-            {this.renderFormButtons()}
-          </form>
-        </div>
-      </div>
-    );
+    // return <Redirect push to={`/notes/`}/>;
   }
+  return (
+    <div className="card">
+      <div className="card-header">{this.renderFormTitleAction()}</div>
+      <div className="card-body">
+        <form ref="noteForm" onSubmit={this.saveNote}>
+          <div className="form-group">
+            <p>
+              <input
+                className="form-control"
+                style={divStyle}
+                disabled
+                ref={(id) => (this.id = id)}
+                defaultValue={this.props.note.id}
+              />
+            </p>
+
+            <p>
+              <input
+                className="form-control"
+                ref={(title) => (this.title = title)}
+                defaultValue={this.props.note.title}
+                placeholder="enter title"
+              />
+            </p>
+            <p>
+              <input
+                className="form-control"
+                ref={(userWebId) => (this.userWebId = userWebId)}
+                defaultValue={this.props.note.userWebId}
+                placeholder="enter user WebId"
+              />
+            </p>
+
+            <p>
+              <input type="checkbox" id="writing" value="on" ref={(selectedWriting) => this.selectedWriting = selectedWriting} />
+              <label htmlFor="writing"> sharing with writing access </label>
+
+
+              <input type="checkbox" id="reading" value="on" ref={(selectedReading) => this.selectedReading = selectedReading} />
+              <label htmlFor="reading"> sharing with reading access </label>
+            </p>
+
+
+            <p>
+              <textarea
+                className="form-control"
+                rows="10"
+                ref={(description) => (this.description = description)}
+                defaultValue={this.props.note.description}
+                placeholder="enter description"
+              />
+            </p>
+          </div>
+          {this.renderFormButtons()}
+        </form>
+      </div>
+    </div>
+  );
+}
 }
 
 export default NoteForm;
