@@ -192,7 +192,16 @@ async function public_note() {
 
 async function friends_note() {
   let session = getDefaultSession();
-  let notes_url = "https://pod.inrupt.com/leslie/Users/pulkit/";
+
+  let baseUrl = getDefaultSession().info.webId.substring(
+    0,
+    getDefaultSession().info.webId.indexOf("/profile/card#me")
+  );
+  console.log("FRIENDS: ", baseUrl.split("/"))
+  baseUrl = baseUrl.split("/");
+  baseUrl = baseUrl[baseUrl.length - 1]
+
+  let notes_url = "https://pod.inrupt.com/leslie/Users/"+baseUrl;
   let normal_date = "2022-05-31T09:33:56.543Z";
 
   console.log("READING SHARED NOTES")
@@ -211,7 +220,7 @@ async function friends_note() {
   let dates = {};
 
   for (var key in def) {
-    if (key == "https://pod.inrupt.com/leslie/Users/pulkit/") {
+    if (key == notes_url) {
       console.log("Skip");
     } else {
       console.log(key);

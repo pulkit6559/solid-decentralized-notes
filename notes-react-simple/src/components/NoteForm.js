@@ -98,7 +98,7 @@ class NoteForm extends Component {
     await access.setAgentAccess(
       this.baseUrl + "/Notesdump/" + note.title,
       friendWebID,
-      { read: selectedReading, write: selectedWriting, append: false },
+      { read: true, write: true, append: false },
       { fetch: session.fetch }
     );
 
@@ -136,7 +136,7 @@ class NoteForm extends Component {
     }
 
     console.log(this.props.note)
-    console.log("edit note ", this.props.note.title);
+    console.log("edit note ", noteTitle);
     
     let editedDataset = await getSolidDataset(
       resourceURL + noteTitle + "#" + noteTitle,

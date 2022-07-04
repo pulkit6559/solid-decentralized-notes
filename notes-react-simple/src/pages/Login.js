@@ -158,14 +158,14 @@ export class LoginComponent extends Component {
     } else {
       let session = getDefaultSession();
       console.log(session);
-      // create_auth_container(getDefaultSession()).then(session => {
-      //   // got value here
-      //   console.log(session)
-      //   console.log("SUCCESS in creating empty auth folder")
-      // }).catch(e => {
-      //   console.log(e);
-      //   console.log('Auth folder exists')
-      // });
+      create_auth_container(getDefaultSession()).then(session => {
+        // got value here
+        console.log(session)
+        console.log("SUCCESS in creating empty auth folder")
+      }).catch(e => {
+        console.log(e);
+        console.log('Auth folder exists')
+      });
       try {
         get_auth_code(getDefaultSession());
       } catch (error) {
