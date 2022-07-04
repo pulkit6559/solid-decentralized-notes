@@ -119,7 +119,7 @@ async function public_note() {
     if (key == "https://pod.inrupt.com/leslie/publicSolidPodFile/") {
       console.log("Skip");
     } else {
-      console.log(key);
+      // console.log(key);
       let dataset = await getSolidDataset(
         key,
         { fetch: session.fetch } // fetch from authenticated session
@@ -127,15 +127,15 @@ async function public_note() {
       let arr_ = key.split("/");
       let Name = arr_[arr_.length - 1];
       let thingName = key + "#" + Name;
-      console.log("THING: ", thingName);
+      // console.log("THING: ", thingName);
       try {
         let profile = getThing(dataset, thingName);
-        console.log(profile);
+        // console.log(profile);
         let url = getStringNoLocale(profile, SCHEMA_INRUPT.text);
         let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
         let title = getStringNoLocale(profile, SCHEMA_INRUPT.description);
         let name = getStringNoLocale(profile, SCHEMA_INRUPT.name);
-        console.log(" ", url);
+        // console.log(" ", url);
 
         let dataSet = undefined;
         try {
@@ -146,7 +146,7 @@ async function public_note() {
         } catch (e) {
           continue;
         }
-        console.log("get the data", dataSet);
+        // console.log("get the data", dataSet);
         try {
           let normal_date = "2022-05-29T09:33:56.543Z";
           let arr_ = url.split("/");
@@ -154,13 +154,13 @@ async function public_note() {
           let thingName = url + "#" + Name;
 
           let profile = getThing(dataSet, thingName);
-          console.log("thing", profile);
+          // console.log("thing", profile);
           let description = getStringNoLocale(
             profile,
             SCHEMA_INRUPT.description
           );
           let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
-          console.log("description", description);
+          // console.log("description", description);
 
           if (date == null) {
             date = normal_date;
@@ -178,7 +178,7 @@ async function public_note() {
           continue;
         }
 
-        console.log("shared note", myDataset);
+        // console.log("shared note", myDataset);
         result[key] = profile;
       } catch (e) {
         console.log(e);
@@ -186,7 +186,7 @@ async function public_note() {
       }
     }
   }
-  console.log("all_notes", all_notes);
+  // console.log("all_notes", all_notes);
   return all_notes;
 }
 
@@ -195,12 +195,16 @@ async function friends_note() {
   let notes_url = "https://pod.inrupt.com/leslie/Users/pulkit/";
   let normal_date = "2022-05-31T09:33:56.543Z";
 
+  console.log("READING SHARED NOTES")
+
   const myDataset = await getSolidDataset(
     notes_url,
     { fetch: session.fetch } // fetch from authenticated session
   );
 
   let def = myDataset["graphs"]["default"];
+
+  console.log( myDataset["graphs"])
 
   let result = {};
   let name_description = {};
@@ -211,27 +215,40 @@ async function friends_note() {
       console.log("Skip");
     } else {
       console.log(key);
-      let dataset = await getSolidDataset(
-        key,
-        { fetch: session.fetch } // fetch from authenticated session
-      );
+      // let dataset = await getSolidDataset(
+      //   key,
+      //   { fetch: session.fetch } // fetch from authenticated session
+      // );
       let arr_ = key.split("/");
-      let Name = arr_[arr_.length - 1];
-      let thingName = key + "#" + Name;
-      console.log("THING: ", thingName);
+      let Name = arr_[arr_.length - 1]; // name of shared reference pulkit_shared_omar_ref 
+      let authorname = Name.split("_")[0];
+      let noteName = Name.split("_").slice(1, -1).join("_")
+      
+      let thingName = "https://pod.inrupt.com/" + authorname + "/Notesdump/" + noteName + "#" + noteName;
+      console.log("USERSHARE THING: ", thingName);
+
+
+
+
       try {
+
+        let dataset = await getSolidDataset(
+          "https://pod.inrupt.com/" + authorname + "/Notesdump/" + noteName,
+          { fetch: session.fetch } // fetch from authenticated session
+        );
+
         let profile = getThing(dataset, thingName);
-        //console.log(profile);
+        console.log("USERSHARE: ", profile);
         let description = getStringNoLocale(profile, SCHEMA_INRUPT.description);
         let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
         //let name = getStringNoLocale(profile, SCHEMA_INRUPT.name)
         console.log("****** ", Name, " ", description);
         result[key] = profile;
-        name_description[Name] = description;
+        name_description[authorname+"#"+noteName] = description;
         if (date == null) {
-          dates[Name] = normal_date;
+          dates[authorname+"#"+noteName] = normal_date;
         } else {
-          dates[Name] = date;
+          dates[authorname+"#"+noteName] = date;
         }
       } catch (e) {
         console.log(e);
@@ -316,6 +333,7 @@ class NotesApp extends Component {
       public_notes: notes[2],
       selectedNote: null,
       editMode: false,
+      notetype: 'own'
     };
 
     this.getNotesNextId = this.getNotesNextId.bind(this);
@@ -363,6 +381,7 @@ class NotesApp extends Component {
       this.setState({
         selectedNote: this.state.notes[notePosition],
         editMode: false,
+        notetype: 'own'
       });
     } else {
       console.warn("note with id " + id + " not found when trying to edit it");
@@ -375,6 +394,7 @@ class NotesApp extends Component {
       this.setState({
         selectedNote: this.state.friend_notes[notePosition],
         editMode: false,
+        notetype: 'friend'
       });
     } else {
       console.warn("note with id " + id + " not found when trying to edit it");
@@ -387,6 +407,7 @@ class NotesApp extends Component {
       this.setState({
         selectedNote: this.state.public_notes[notePosition],
         editMode: false,
+        notetype: 'public'
       });
     } else {
       console.warn("note with id " + id + " not found when trying to edit it");
@@ -394,12 +415,28 @@ class NotesApp extends Component {
   }
 
   openEditNote(id) {
-    const notePosition = this.state.notes.findIndex((n) => n.id === id);
+    let notePosition = -1;
+    if (this.state.notetype=='friend'){
+      notePosition = this.state.friend_notes.findIndex((n) => n.id === id);
+    } else {
+      notePosition = this.state.notes.findIndex((n) => n.id === id);
+    }
     if (notePosition >= 0) {
-      this.setState({
-        selectedNote: this.state.notes[notePosition],
-        editMode: true,
-      });
+      if (this.state.notetype=='friend'){
+        this.setState({
+          selectedNote: this.state.friend_notes[notePosition],
+          editMode: true,
+        });
+      } else {
+        this.setState({
+          selectedNote: this.state.notes[notePosition],
+          editMode: true,
+        });
+      }
+      // this.setState({
+      //   selectedNote: this.state.notes[notePosition],
+      //   editMode: true,
+      // });
     } else {
       console.warn(
         "note with id " + id + " not found when trying to open for edit"

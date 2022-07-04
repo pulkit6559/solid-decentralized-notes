@@ -122,16 +122,30 @@ class NoteForm extends Component {
 
   async edit_note(note) {
     let session = getDefaultSession();
+    let resourceURL = "";
+    let noteTitle = "";
+    let sharedBy = "";
+    if (note.title.includes('#')){
+        noteTitle = note.title.split("#")[1];
+        sharedBy =  note.title.split("#")[0];
+        resourceURL = "https://pod.inrupt.com/" + sharedBy + "/Notesdump/";
+    }
+    else{
+        resourceURL = this.baseUrl + "/Notesdump/";
+        noteTitle = this.props.note.title
+    }
+
+    console.log(this.props.note)
     console.log("edit note ", this.props.note.title);
-    let resourceURL = this.baseUrl + "/Notesdump/";
+    
     let editedDataset = await getSolidDataset(
-      resourceURL + this.props.note.title + "#" + this.props.note.title,
+      resourceURL + noteTitle + "#" + noteTitle,
       { fetch: session.fetch }
     );
     console.log("EditedDataset is ", editedDataset);
     let editThing = getThing(
       editedDataset,
-      resourceURL + this.props.note.title + "#" + this.props.note.title
+      resourceURL + noteTitle + "#" + noteTitle
     );
 
     console.log("EditThing is this", editThing);
@@ -144,7 +158,7 @@ class NoteForm extends Component {
     editedDataset = setThing(editedDataset, editThing);
 
     const savedSolidDataset = saveSolidDatasetAt(
-      resourceURL + this.props.note.title,
+      resourceURL + noteTitle,
       editedDataset,
       { fetch: session.fetch } // fetch from authenticated Session
     );
@@ -165,26 +179,31 @@ saveNote(event) {
       date: this.endDate
     };
 
-    this.addNote(note)
-      .then((ret) => {
-        if (!(note.userWebId === "")) {
-          console.log("SHARING WITH USER");
-          this.shareWithFriend(
-            note,
-            "https://pod.inrupt.com/" + note.userWebId + "/profile/card#me",
-            note.userWebId,
-            this.selectedWriting,
-            this.selectedReading
-          )
-            .then((ret) => { })
-            .catch((e) => {
-              console.log(e);
-            });
-        }
-      })
-      .catch((e) => {
+    if (note.title.includes("#")){ // editing shared note
         this.edit_note(note);
-      });
+    }
+    else{
+        this.addNote(note)
+        .then((ret) => {
+            if (!(note.userWebId === "")) {
+            console.log("SHARING WITH USER");
+            this.shareWithFriend(
+                note,
+                "https://pod.inrupt.com/" + note.userWebId + "/profile/card#me",
+                note.userWebId,
+                this.selectedWriting,
+                this.selectedReading
+            )
+                .then((ret) => { })
+                .catch((e) => {
+                console.log(e);
+                });
+            }
+        })
+        .catch((e) => {
+            this.edit_note(note);
+        });
+    }
 
     this.props.persistNote(note);
     this.setState({ redirect: true });
