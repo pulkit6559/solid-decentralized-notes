@@ -73,7 +73,9 @@ What can our system do:
 - Policy framework
 - Revoking access for shared and public notes and adding this to the frontend
 - Frontend, list all own notes, all readable shared notes and all public notes
-- Added functionality of "Edit Button" 
+- Added functionality of "Edit Button"
+- Added checkboxes for reading/writing access
+- Revoke Access for notes that are shared with friends 
 
 
 ## Roadmap
@@ -85,10 +87,9 @@ Currently working on open issues:
 
 
 ## Current Issues
-- n/a
+- It is as of now impossible to update date while editing note, this will be adressed after the final presentation
 
 ## To-dos
-- Revoke Access for notes that are shared with friends 
 - Create final presentation
 - Create final poster
 - Clean code
@@ -100,7 +101,7 @@ This project is being worked on by Timothy Clemens Borrell, Pulkit Arora, Haihua
 
 
 ## Project status
-Final stage of lab (now in week 11 of the lab)
+Final stage of lab (now in week 12 of the lab)
 Currently in Milestone 3 of the lab. Preparations of final presentation and poster are taking place.
 
 
