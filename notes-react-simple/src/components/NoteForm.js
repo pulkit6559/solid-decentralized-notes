@@ -97,7 +97,7 @@ class NoteForm extends Component {
     await access.setAgentAccess(
       this.baseUrl + "/Notesdump/" + note.title,
       friendWebID,
-      { read: true, write: true, append: false },
+      { read: selectedReading, write: selectedWriting, append: false },
       { fetch: session.fetch }
     );
 
@@ -185,9 +185,6 @@ saveNote(event) {
         this.addNote(note)
         .then((ret) => {
             if (!(note.userWebId === "")) {
-              console.log("SHARING WITH USER");
-              console.log("reading access is ", this.selectedReading);
-              console.log("writing access is ", this.selectedWriting);
               this.shareWithFriend(
                   note,
                   "https://pod.inrupt.com/" + note.userWebId + "/profile/card#me",
