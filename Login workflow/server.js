@@ -297,16 +297,6 @@ app.post("/shareWithWebID", async (req, res) => {
   res.send("Added access to file for leslie")
 });
 
-app.post("/revokePublicAccess",async (req,res)=>
-{
-   const note_ref_url="https://pod.inrupt.com/leslie/publicSolidPodFile/"+req.title;
-  const session = app.locals.session;
-  const savedSolidDataset = await deleteSolidDataset(
-    note_ref_url,
-    { fetch: session.fetch }
-  );
-})
-
 app.post("/revokeFriendAccess", async (req, res) => {
 
   // verify the user
