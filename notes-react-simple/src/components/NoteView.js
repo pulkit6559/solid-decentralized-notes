@@ -118,13 +118,19 @@ class NoteView extends Component {
           auth: this.userAuth,
         };
 
-        // call the backend to remove reference of shared note
-        axios
-          .post("http://localhost:4444/revokeFriendAccess", note_ref)
-          .then(() => console.log("note shared"))
-          .catch((err) => {
-            console.log(err);
-          });
+        if(this.userWebId.value==="")
+        {
+          axios.post("http://localhost:4444/revokePublicAccess",note_ref)
+        }
+        else {
+          // call the backend to remove reference of shared note
+          axios
+            .post("http://localhost:4444/revokeFriendAccess", note_ref)
+            .then(() => console.log("note shared"))
+            .catch((err) => {
+              console.log(err);
+            });
+        }
       })
       .catch((e) => {
         console.log(e);
