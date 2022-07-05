@@ -94,7 +94,6 @@ class NoteForm extends Component {
 
   async shareWithFriend(note, friendWebID, friendName, selectedWriting, selectedReading) {
     let session = getDefaultSession();
-    console.log(document.getElementById("writing"), document.getElementById("reading"))
     await access.setAgentAccess(
       this.baseUrl + "/Notesdump/" + note.title,
       friendWebID,
@@ -186,18 +185,20 @@ saveNote(event) {
         this.addNote(note)
         .then((ret) => {
             if (!(note.userWebId === "")) {
-            console.log("SHARING WITH USER");
-            this.shareWithFriend(
-                note,
-                "https://pod.inrupt.com/" + note.userWebId + "/profile/card#me",
-                note.userWebId,
-                this.selectedWriting,
-                this.selectedReading
-            )
-                .then((ret) => { })
-                .catch((e) => {
-                console.log(e);
-                });
+              console.log("SHARING WITH USER");
+              console.log("reading access is ", this.selectedReading);
+              console.log("writing access is ", this.selectedWriting);
+              this.shareWithFriend(
+                  note,
+                  "https://pod.inrupt.com/" + note.userWebId + "/profile/card#me",
+                  note.userWebId,
+                  this.selectedWriting,
+                  this.selectedReading
+              )
+                  .then((ret) => { })
+                  .catch((e) => {
+                  console.log(e);
+                  });
             }
         })
         .catch((e) => {
@@ -359,12 +360,12 @@ render() {
             </p>
 
             <p>
-              <input type="checkbox" id="writing" value="on" ref={(selectedWriting) => this.selectedWriting = selectedWriting} />
-              <label htmlFor="writing"> sharing with writing access </label>
+              <input type="checkbox" id="writing" name="writing" value="on" ref={(selectedWriting) => this.selectedWriting = document.querySelector("#writing").checked}/>
+              <label htmlFor="writing">sharing with writing access </label>
 
+              <input type="checkbox" id="reading" name="reading" value="on" ref={(selectedReading) => this.selectedReading = document.querySelector("#reading").checked} />
+              <label htmlFor="reading">  sharing with reading access </label>
 
-              <input type="checkbox" id="reading" value="on" ref={(selectedReading) => this.selectedReading = selectedReading} />
-              <label htmlFor="reading"> sharing with reading access </label>
             </p>
 
 
