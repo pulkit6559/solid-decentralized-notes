@@ -101,7 +101,7 @@ This project is being worked on by Timothy Clemens Borrell, Pulkit Arora, Haihua
 
 
 ## Project status
-Final stage of lab (now in week 12 of the lab)
-Currently in Milestone 3 of the lab. Preparations of final presentation and poster are taking place.
+Post Final stage of lab (now in week 13 of the lab)
+Currently finished the lab. Final presentation, the demonstration of the prototype and poster have been presented to the professor on July 6th 2022. Final changes and tweaks to the Repository and the code are being done until end of July.
 
 
