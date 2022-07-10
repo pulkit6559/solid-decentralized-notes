@@ -8,6 +8,7 @@ This repository contains the Solid Model Project in the Sovereign Data Exchange 
 Solid is a model that enables users to store their data in decentralized Pods, that are like personal web servers that can store data. Here any type of information can be saved within a Solid Pod, access control can be edited and the user has access at all times. 
 In this project, a base Solid model including servers and pods will be implemented and tested with a use case.
 
+
 ## Methods
 Here are all methods that work within the Solid framework and are the basis of the project: 
 - "CreateNotes"
@@ -20,17 +21,24 @@ Here are all methods that work within the Solid framework and are the basis of t
     - Read the contents of all accessable nodes.
 
 
-
-## Requirements
+## Functionalities of the frontend
 A decentralized data exchange application should contain the following functionalities:
-It provides an interface that allows fetching user data from a decentralized data store. It allows sharing and modifications in one of the following scenarios
-1. Within application b/w diff user’s pods: User X can be allowed to view User Y’s info when given the appropriate permissions
-2. Public sharing: A user can decide to make the data available for public usage
-3. With other data applications: eg, a blog stored in a users pod as a social media posts
-             
+It provides an interface that allows fetching user data from a decentralized data store. It supports following functionalities:
+1. Within application between different user’s pods: User X can be allowed to view User Y’s info when given the appropriate permissions
+    1.1 Add Write/Read Access
+        1.1.1 Write access means that a shared note can be edited by User X
+        1.1.2 Read access means that a note is unchangable by any befriended user and can only be viewed
+2. Revoke friend access: User X isn't allowed to view User Y's info any longer
+3. Public sharing: A user can decide to make the data available for public usage
+4. Revoke public sharing: A created note by a user is being deleted from the public space and can't be viewed any more
+5. Edit notes: A User is able to change the description of a note that he created (or as already explained in (1.1.1) a note that has been shared with him with the "Write"-access authority)
+
+## Getting up a Solid Pod
+In order for the frontend to work, the connection to a Solid Pod is needed. As it is the decentralized data storage, the user needs to setup an own pod that will get connected to the prototype of this repository. There are multiple ways to set up a Solid Pod, we would suggest however to setup a Pod the same way the development team of this project did, in order to avoid any complications along the way. 
+A user can get a Solid Pod from an authenticated Pod Provider on [this website.](https://solidproject.org/users/get-a-pod#get-a-pod-from-a-pod-provider) We suggest getting a Pod from [Inrupt Pod Spaces.](https://signup.pod.inrupt.com). The credentials, username and password, that are defined during the set up, are important for logging on to the Pod and is needed for the usage for the frontend. 
 
 ## Installation
-In order to run the code an installment of Node.js as well as npm is needed. Node.js can be downloaded [here](https://nodejs.org/en/download/). Further instructions on how to install Node.js as well as npm is explained on [this website.](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). Node.js version 12.20.0 is required for this project to run smoothly.
+In order to run the code an installment of Node.js as well as npm is needed. Node.js can be downloaded [here](https://nodejs.org/en/download/). Further instructions on how to install Node.js as well as npm is explained on [this website.](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) Node.js version 12.20.0 is required for this project to run smoothly.
 
 ## Running Code
 1. Running the server
@@ -48,6 +56,20 @@ npm start
 ```
 
 Once both are running go to `localhost:3000` to access the application.
+
+
+## Website pages and its contents
+1. Login: 
+    This will ensure and check whether the frontend has access to the Pod of the logged in user. Asks user to allow access to the data. A new login to the user's pod might be needed
+2. Home:
+    This is the home page
+3. Notes:
+    Here the note creating and editing, access management page
+4. Contacts
+    Adding Contacts to the user's friend list
+5. About
+    Information about the developers
+
 
 ## Current Use Case Scenario
 Motivation: Allow users to make notes collaboratively
@@ -76,24 +98,23 @@ What can our system do:
 - Added functionality of "Edit Button"
 - Added checkboxes for reading/writing access
 - Revoke Access for notes that are shared with friends 
+- Final presentation
+- Final poster
 
 
 ## Roadmap
 Currently working on open issues: 
 - Writing/Maintaining README.md
-- Frontend, list all notes created by the user
 - Cleanup of the repository
 - Cleanup of the code
 
 
 ## Current Issues
-- It is as of now impossible to update date while editing note, this will be adressed after the final presentation
+- It is as of now impossible to update date while editing note
 
 ## To-dos
-- Create final presentation
-- Create final poster
 - Clean code
-- Finalise model and use case scenario
+- Finalise model
 
 
 ## Authors and acknowledgment
