@@ -25,9 +25,9 @@ Here are all methods that work within the Solid framework and are the basis of t
 A decentralized data exchange application should contain the following functionalities:
 It provides an interface that allows fetching user data from a decentralized data store. It supports following functionalities:
 1. Within application between different user’s pods: User X can be allowed to view User Y’s info when given the appropriate permissions
-    1.1 Add Write/Read Access
-        1.1.1 Write access means that a shared note can be edited by User X
-        1.1.2 Read access means that a note is unchangable by any befriended user and can only be viewed
+    - 1.1 Add Write/Read Access
+        - 1.1.1 Write access means that a shared note can be edited by User X
+        - 1.1.2 Read access means that a note is unchangable by any befriended user and can only be viewed
 2. Revoke friend access: User X isn't allowed to view User Y's info any longer
 3. Public sharing: A user can decide to make the data available for public usage
 4. Revoke public sharing: A created note by a user is being deleted from the public space and can't be viewed any more
