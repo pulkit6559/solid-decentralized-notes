@@ -33,7 +33,7 @@ It provides an interface that allows fetching user data from a decentralized dat
 4. Revoke public sharing: A created note by a user is being deleted from the public space and can't be viewed any more
 5. Edit notes: A User is able to change the description of a note that he created (or as already explained in (1.1.1) a note that has been shared with him with the "Write"-access authority)
 
-## Getting up a Solid Pod
+## Getting a Solid Pod
 In order for the frontend to work, the connection to a Solid Pod is needed. As it is the decentralized data storage, the user needs to setup an own pod that will get connected to the prototype of this repository. There are multiple ways to set up a Solid Pod, we would suggest however to setup a Pod the same way the development team of this project did, in order to avoid any complications along the way. 
 A user can get a Solid Pod from an authenticated Pod Provider on [this website.](https://solidproject.org/users/get-a-pod#get-a-pod-from-a-pod-provider) We suggest getting a Pod from [Inrupt Pod Spaces.](https://signup.pod.inrupt.com). The credentials, username and password, that are defined during the set up, are important for logging on to the Pod and is needed for the usage for the frontend. 
 
