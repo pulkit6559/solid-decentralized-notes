@@ -100,7 +100,7 @@ class NoteView extends Component {
     const notes_url = this.baseUrl + "/Notesdump/";
     await access.setAgentAccess(
       notes_url + this.props.note.title,
-      this.baseUrl + "/profile/card#me",
+      'https://pod.inrupt.com/' + this.userWebId + '/profile/card#me',
       { read: false, write: false, append: false },
       { fetch: session.fetch }
     );
@@ -118,13 +118,29 @@ class NoteView extends Component {
           auth: this.userAuth,
         };
 
+        if(this.userWebId.value=="public")
+        {
+          axios.post("http://localhost:4444/revokePublicAccess",note_ref)
+        }
+        else {
+          // call the backend to remove reference of shared note
+          axios
+            .post("http://localhost:4444/revokeFriendAccess", note_ref)
+            .then(() => console.log("note shared"))
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+
+        
+        
         // call the backend to remove reference of shared note
-        axios
-          .post("http://localhost:4444/revokeFriendAccess", note_ref)
-          .then(() => console.log("note shared"))
-          .catch((err) => {
-            console.log(err);
-          });
+        // axios
+        //   .post("http://localhost:4444/revokeFriendAccess", note_ref)
+        //   .then(() => console.log("note shared"))
+        //   .catch((err) => {
+        //     console.log(err);
+        //   });
       })
       .catch((e) => {
         console.log(e);

@@ -36,6 +36,7 @@ class NoteForm extends Component {
     this.saveNote = this.saveNote.bind(this);
     this.shareNote = this.shareNote.bind(this);
     this.readAuthCode = this.readAuthCode.bind(this);
+    this.public_temp = this.public_temp.bind(this)
     this.readAuthCode()
       .then((ret) => {
         this.userAuth = ret;
@@ -94,10 +95,11 @@ class NoteForm extends Component {
 
   async shareWithFriend(note, friendWebID, friendName, selectedWriting, selectedReading) {
     let session = getDefaultSession();
+    console.log("PERMISSIONS: ", selectedReading || selectedWriting, selectedWriting)
     await access.setAgentAccess(
       this.baseUrl + "/Notesdump/" + note.title,
       friendWebID,
-      { read: selectedReading, write: selectedWriting, append: false },
+      { read: selectedReading || selectedWriting, write: selectedWriting, append: false },
       { fetch: session.fetch }
     );
 
@@ -117,6 +119,15 @@ class NoteForm extends Component {
       .catch((err) => {
         console.error(err);
       });
+  }
+
+  async public_temp(note){
+    let session = getDefaultSession();
+    await access.setPublicAccess(
+      this.baseUrl + "/Notesdump/" + note.title,
+      { read: true, write: false, append: false },
+      { fetch: session.fetch }
+    );
   }
 
   async edit_note(note) {
@@ -161,6 +172,45 @@ class NoteForm extends Component {
       editedDataset,
       { fetch: session.fetch } // fetch from authenticated Session
     );
+
+    console.log(note.userWebId, "PUBLICCCC")
+    if (note.userWebId === "public") {
+
+      this.public_temp(note).then((ret) => { })
+      .catch((e) => {
+      console.log(e);
+      });
+
+      let note_ref = {
+        user_card: this.baseUrl + "/profile/card#me",
+        user_name: this.username,
+        noteURL: this.baseUrl + "/Notesdump/" + note.title,
+        title: note.title,
+        auth: this.userAuth,
+      };
+      // call the backend to save reference to public note
+      axios
+        .post("http://localhost:4444/storetoPublicPod", note_ref)
+        .then(() => {
+          console.log("node shared")
+        })
+        .catch((err) => {
+          console.error(err);
+      });
+    } else if (!(note.userWebId === "")){
+      this.shareWithFriend(
+          note,
+          "https://pod.inrupt.com/" + note.userWebId + "/profile/card#me",
+          note.userWebId,
+          this.selectedWriting,
+          this.selectedReading
+      )
+          .then((ret) => { })
+          .catch((e) => {
+          console.log(e);
+          });
+    }
+
   }
 
 
@@ -250,6 +300,7 @@ shareNote(event) {
     this.shareNoteAsync(note)
       .then((ret) => { })
       .catch((e) => {
+
         console.log(e);
       });
 

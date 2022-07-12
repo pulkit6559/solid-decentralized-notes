@@ -90,9 +90,9 @@ async function create_auth_container(session) {
   // send request to server to write code
 }
 
-function get_auth_code(session) {
-  let web_id = session.info.webId;
-  console.log(session.info, session.info.webId);
+function get_auth_code(session_v) {
+  let web_id = session_v.info.webId;
+  console.log(session_v, session_v.info.webId);
   let user_data = {
     webID: web_id,
   };
@@ -119,42 +119,53 @@ export class LoginComponent extends Component {
   render() {
     // let session_f =
     // navigate = useNavigate();
+    let main_session = {};
 
     if (!getDefaultSession().info.isLoggedIn) {
       get_session()
         .then((session) => {
           // got value here
-          console.log(session);
+          console.log(session, "INITIAL");
+          main_session = session;
+        
+          create_auth_container(main_session)
+          .then((session) => {
+            // got value here
+            console.log(session);
+            console.log("SUCCESS in creating empty auth folder");
+            // make server write the code
+            // try {
+            //   get_auth_code(main_session);
+            // } catch (error) {
+            //   console.log(error);
+            // }
+          })
+          .catch((e) => {
+            console.log(e);
+            console.log("Auth folder exists");
+            console.log(main_session, "Auth folder exists");
+            // make server write the code
+            // try {
+            //   console.log('main session', main_session)
+            //   get_auth_code(main_session);
+            // } catch (error) {
+            //   console.log(error);
+            // }
+          });
+
+
+          // try {
+          //   get_auth_code(main_session);
+          // } catch (error) {
+          //   console.log(error);
+          // }
+
         })
         .catch((e) => {
           // error
           console.log(e);
         });
 
-      create_auth_container(getDefaultSession())
-        .then((session) => {
-          // got value here
-          console.log(session);
-          console.log("SUCCESS in creating empty auth folder");
-
-          // make server write the code
-          try {
-            get_auth_code(getDefaultSession());
-          } catch (error) {
-            console.log(error);
-          }
-        })
-        .catch((e) => {
-          console.log(e);
-          console.log("Auth folder exists");
-
-          // make server write the code
-          try {
-            get_auth_code(getDefaultSession());
-          } catch (error) {
-            console.log(error);
-          }
-        });
     } else {
       let session = getDefaultSession();
       console.log(session);
@@ -167,7 +178,7 @@ export class LoginComponent extends Component {
         console.log('Auth folder exists')
       });
       try {
-        get_auth_code(getDefaultSession());
+        get_auth_code(session);
       } catch (error) {
         console.log(error);
       }

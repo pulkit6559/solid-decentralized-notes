@@ -180,6 +180,18 @@ app.get("/readAllNotes", async (req, res) => {
   
 });
 
+app.post("/revokePublicAccess",async (req,res)=>
+{
+    console.log(req.body)
+   const note_ref_url="https://pod.inrupt.com/leslie/publicSolidPodFile/"+req.body.title;
+  const session = app.locals.session;
+  const savedSolidDataset = await deleteSolidDataset(
+    note_ref_url,
+    { fetch: session.fetch }
+  );
+})
+
+
 app.post("/storetoPublicPod", async (req, res) => {
 
   // verify the user

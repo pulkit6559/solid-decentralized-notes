@@ -49,17 +49,18 @@ async function format_request() {
     if (key == baseUrl + " /Notesdump/") {
       console.log("Skip");
     } else {
-      console.log(key);
-      let dataset = await getSolidDataset(
-        key,
-        { fetch: session.fetch } // fetch from authenticated session
-      );
-      let arr_ = key.split("/");
-      let Name = arr_[arr_.length - 1];
-      let thingName = key + "#" + Name;
-      let normal_date = "2022-05-30T09:33:56.543Z";
-      console.log("THING: ", thingName);
       try {
+        console.log(key);
+        let dataset = await getSolidDataset(
+          key,
+          { fetch: session.fetch } // fetch from authenticated session
+        );
+        let arr_ = key.split("/");
+        let Name = arr_[arr_.length - 1];
+        let thingName = key + "#" + Name;
+        let normal_date = "2022-05-30T09:33:56.543Z";
+        console.log("THING: ", thingName);
+
         let profile = getThing(dataset, thingName);
         console.log(profile);
         let date = getStringNoLocale(profile, SCHEMA_INRUPT.endDate);
