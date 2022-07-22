@@ -18,6 +18,7 @@ import {
   handleIncomingRedirect,
   getDefaultSession,
   Session,
+  fetch
 } from "@inrupt/solid-client-authn-browser";
 
 async function loginAndFetch() {
@@ -29,7 +30,7 @@ async function loginAndFetch() {
   //   If the page is not being loaded after a redirect from the Solid Identity Provider,
   //      nothing happens.
   await handleIncomingRedirect();
-  const session = new Session();
+  let session = new Session();
   // window.session_var = session;
   // sessionStorage.setItem("session", session);
   // Store.setState("session", session);
@@ -50,48 +51,71 @@ async function loginAndFetch() {
         clientName: "Demo app",
       })
       .then();
+    
+      console.log("Session 1: ", session)
   }
+  else{
+    session = getDefaultSession();
+    console.log("Session 2: ", session)
+
+  }
+
+  return session;
 }
 
-async function create_auth_container(session) {
-  // create folder notes_auth or check if it exists
-  // await createContainerAt("https://pod.inrupt.com/pulkit/notesAuth",
-  // { fetch: session.fetch });
-  // assign leslie write access
 
-  let baseUrl = getDefaultSession().info.webId.substring(
-    0,
-    getDefaultSession().info.webId.indexOf("/profile/card#me")
-  );
-  let auth_url = baseUrl + "/notesAuth";
+async function save_auth(session, auth_url){
 
   let dataset = createSolidDataset();
-  const code_thing = buildThing(createThing({ name: "code" }))
-    .addStringNoLocale(SCHEMA_INRUPT.accessCode, "xxxx")
-    .build();
-  dataset = setThing(dataset, code_thing);
-  const savedSolidDataset = await saveSolidDatasetAt(
-    auth_url + "/code",
-    dataset,
-    { fetch: session.fetch } // fetch from authenticated Session
-  );
+    const code_thing = buildThing(createThing({ name: "code" }))
+      .addStringNoLocale(SCHEMA_INRUPT.accessCode, "xxxx")
+      .build();
+    dataset = setThing(dataset, code_thing);
+    const savedSolidDataset = await saveSolidDatasetAt(
+      auth_url + "/code",
+      dataset,
+      { fetch: session.fetch } // fetch from authenticated Session
+    );
 
+}
+
+async function set_access(session, auth_url){
   await access.setAgentAccess(
     auth_url + "/code",
     "https://pod.inrupt.com/leslie/profile/card#me",
     { read: true, write: true, append: true },
     { fetch: session.fetch }
   );
-  // let acl = await getResourceInfoWithAcl(
-  //   "https://pod.inrupt.com/pulkit/notesAuth",
-  //   { fetch: session.fetch },
-  // )
-  // return acl
-  // send request to server to write code
+}
+
+function create_auth_container(session) {
+  // create folder notes_auth or check if it exists
+  // await createContainerAt("https://pod.inrupt.com/pulkit/notesAuth",
+  // { fetch: session.fetch });
+  // assign leslie write access
+
+  console.log("AUTH CONTAINER SESSION: ", session)
+  // let INFO = "";
+  // INFO = session.info;
+  setTimeout(function(){
+    // console.log("ZZZZZ INFO: ", INFO, INFO.webId)
+    let baseUrl = session.info.webId.substring(
+      0,
+      session.info.webId.indexOf("/profile/card#me")
+    );
+    let auth_url = baseUrl + "/notesAuth2";
+
+    console.log("IN CREATE_AUTH_CONTAINER before adding folder")
+    save_auth(session, auth_url).then(()=>{})
+  
+    set_access(session, auth_url).then(()=>{})
+  }, 2000)
+
 }
 
 function get_auth_code(session_v) {
   let web_id = session_v.info.webId;
+  console.log("IN GET_AUTH_CODE")
   console.log(session_v, session_v.info.webId);
   let user_data = {
     webID: web_id,
@@ -108,11 +132,17 @@ function get_auth_code(session_v) {
 }
 
 async function get_session() {
-  loginAndFetch();
+  let session = "";
+  loginAndFetch().then((sess) => {session = sess});
+  
   // let session = sessionStorage.getItem("session");
-  let session = getDefaultSession();
+  // let session = getDefaultSession();
   // let session = getSessionFromStorage(sessionID);
-  return session;
+  setTimeout(function(){
+    console.log("GET_SESSION: ", session)
+    return session;
+  }, 3000)
+  
 }
 
 export class LoginComponent extends Component {
@@ -122,36 +152,39 @@ export class LoginComponent extends Component {
     let main_session = {};
 
     if (!getDefaultSession().info.isLoggedIn) {
-      get_session()
+        get_session()
         .then((session) => {
           // got value here
-          console.log(session, "INITIAL");
-          main_session = session;
+          session = getDefaultSession();
+
+          setTimeout(function(){
+            console.log(session, "INITIAL");
+          }, 2000)
         
-          create_auth_container(main_session)
-          .then((session) => {
-            // got value here
-            console.log(session);
-            console.log("SUCCESS in creating empty auth folder");
-            // make server write the code
-            // try {
-            //   get_auth_code(main_session);
-            // } catch (error) {
-            //   console.log(error);
-            // }
-          })
-          .catch((e) => {
-            console.log(e);
-            console.log("Auth folder exists");
-            console.log(main_session, "Auth folder exists");
-            // make server write the code
-            // try {
-            //   console.log('main session', main_session)
-            //   get_auth_code(main_session);
-            // } catch (error) {
-            //   console.log(error);
-            // }
-          });
+          create_auth_container(session)
+          // .then((session) => {
+          //   // got value here
+          //   console.log(session);
+          //   console.log("SUCCESS in creating empty auth folder");
+          //   // make server write the code
+          //   // try {
+          //   //   get_auth_code(main_session);
+          //   // } catch (error) {
+          //   //   console.log(error);
+          //   // }
+          // })
+          // .catch((e) => {
+          //   console.log(e);
+          //   console.log("Auth folder exists");
+          //   console.log(main_session, "Auth folder exists");
+          //   // make server write the code
+          //   // try {
+          //   //   console.log('main session', main_session)
+          //   //   get_auth_code(main_session);
+          //   // } catch (error) {
+          //   //   console.log(error);
+          //   // }
+          // });
 
 
           // try {
