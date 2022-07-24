@@ -9,6 +9,52 @@ Solid is a model that enables users to store their data in decentralized Pods, t
 In this project, a base Solid model including servers and pods will be implemented and tested with a use case.
 
 
+## Getting a Solid Pod
+In order for the frontend to work, the connection to a Solid Pod is needed. As it is the decentralized data storage, the user needs to setup an own pod that will get connected to the prototype of this repository. There are multiple ways to set up a Solid Pod, we would suggest however to setup a Pod the same way the development team of this project did, in order to avoid any complications along the way. 
+A user can get a Solid Pod from an authenticated Pod Provider on [this website.](https://solidproject.org/users/get-a-pod#get-a-pod-from-a-pod-provider) We suggest getting a Pod from [Inrupt Pod Spaces.](https://signup.pod.inrupt.com). The credentials, username and password, that are defined during the set up, are important for logging on to the Pod and is needed for the usage for the frontend. 
+
+## Installation
+In order to run the code an installment of Node.js as well as npm is needed. Node.js can be downloaded [here](https://nodejs.org/en/download/). Further instructions on how to install Node.js as well as npm is explained on [this website.](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) Node.js version 12.20.0 is required for this project to run smoothly.
+
+## Running Code
+1. Running the server
+```
+* cd "Login Workflow"
+* npm install
+* npm start
+
+Now that the server is running authenticate the server pod
+
+* Open localhost:4444 in a browser
+* A prompt will ask for login credentials, use the ones provided below
+
+username: leslie
+password: 123qweASD
+
+The server pod is now authenticated
+
+```
+
+2. Running the Frontend
+```
+cd notes-react-simple
+npm install
+npm start
+
+Now that the frontend is running authenticate the session with your login credentials
+
+* Open localhost:3000 in a browser (either use a different browser than the server or a private session)
+* A prompt will ask for login credentials, use the credentials of your own pod (to test the functionalities, you can also use the credentials provided below)
+
+username: pulkit
+password: Pulkit123@
+
+* Click on 'login' to register the user with the server (to authenticate fututre requests this user makes)
+```
+
+Once both are running go to `localhost:3000` to access the application.
+
+
 ## Methods
 Here are all methods that work within the Solid framework and are the basis of the project: 
 - "CreateNotes"
@@ -19,7 +65,6 @@ Here are all methods that work within the Solid framework and are the basis of t
     - Give access to friend to private Note. Other users won't be able to access such note.
 - "readNote"
     - Read the contents of all accessable nodes.
-
 
 ## Functionalities of the frontend
 A decentralized data exchange application should contain the following functionalities:
@@ -32,31 +77,6 @@ It provides an interface that allows fetching user data from a decentralized dat
 3. Public sharing: A user can decide to make the data available for public usage
 4. Revoke public sharing: A created note by a user is being deleted from the public space and can't be viewed any more
 5. Edit notes: A User is able to change the description of a note that he created (or as already explained in (1.1.1) a note that has been shared with him with the "Write"-access authority)
-
-## Getting a Solid Pod
-In order for the frontend to work, the connection to a Solid Pod is needed. As it is the decentralized data storage, the user needs to setup an own pod that will get connected to the prototype of this repository. There are multiple ways to set up a Solid Pod, we would suggest however to setup a Pod the same way the development team of this project did, in order to avoid any complications along the way. 
-A user can get a Solid Pod from an authenticated Pod Provider on [this website.](https://solidproject.org/users/get-a-pod#get-a-pod-from-a-pod-provider) We suggest getting a Pod from [Inrupt Pod Spaces.](https://signup.pod.inrupt.com). The credentials, username and password, that are defined during the set up, are important for logging on to the Pod and is needed for the usage for the frontend. 
-
-## Installation
-In order to run the code an installment of Node.js as well as npm is needed. Node.js can be downloaded [here](https://nodejs.org/en/download/). Further instructions on how to install Node.js as well as npm is explained on [this website.](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) Node.js version 12.20.0 is required for this project to run smoothly.
-
-## Running Code
-1. Running the server
-```
-cd "Login Workflow"
-npm install
-npm start
-```
-
-2. Running the Frontend
-```
-cd notes-react-simple
-npm install
-npm start
-```
-
-Once both are running go to `localhost:3000` to access the application.
-
 
 ## Website pages and its contents
 1. Login: 
@@ -79,6 +99,7 @@ What can our system do:
 3. Public sharing of notes
 4. Display all notes for user
 5. Add friends and share notes with them
+
 
 ## Future possible work
 1. (*) Associate notes with tags, eg (private and public) and also with specific tags (Mathematics, physics, screenplay) 
@@ -124,5 +145,3 @@ This project is being worked on by Timothy Clemens Borrell, Pulkit Arora, Haihua
 ## Project status
 Post Final stage of lab (now in week 13 of the lab)
 Currently finished the lab. Final presentation, the demonstration of the prototype and poster have been presented to the professor on July 6th 2022. Final changes and tweaks to the Repository and the code are being done until end of July.
-
-
