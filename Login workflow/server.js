@@ -128,57 +128,6 @@ app.get("/afterLogin", async (req, res) => {
   }
 });
 
-app.post("/reactNote", async (req, res) => {
-  console.log("Here!")
-  const session = app.locals.session;
-  console.log(req.body)
-  let courseSolidDataset = createSolidDataset();
-  const newBookThing1 = buildThing(createThing({ name: req.body.title }))
-    .addStringNoLocale(SCHEMA_INRUPT.name, "react generated note")
-    .addStringNoLocale(SCHEMA_INRUPT.description, req.body.description)
-    .addStringNoLocale(SCHEMA_INRUPT.text, req.body.description)
-    .addUrl(RDF.type, "https://schema.org/TextDigitalDocument")
-    .build();
-
-
-  courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
-  // courseSolidDataset2 = setThing(courseSolidDataset2, newTextThing2);
-
-  const savedSolidDataset = await saveSolidDatasetAt(
-    "https://pod.inrupt.com/pulkit/Notesdump/" + req.body.title,
-    courseSolidDataset,
-    { fetch: session.fetch }             // fetch from authenticated Session
-  );
-  console.log("Here! Done writing")
-  res.send(`sent data to pod`);
-});
-
-
-app.get("/readAllNotes", async (req, res) => {
-
-  const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/";
-  const myDataset = await getSolidDataset(
-    "https://pod.inrupt.com/pulkit/Notesdump/",
-    { fetch: fetch }          // fetch from authenticated session
-  );
-
-  // console.log(myDataset)
-  console.log(myDataset.graphs.default)
-
-  notesFolder = myDataset.graphs.default
-
-  for (const entry of Object.entries(notesFolder)) {
-    if (entry[0]=="https://pod.inrupt.com/pulkit/Notesdump/"){
-      console.log("USELESS");
-    }
-    else{
-    console.log(entry);
-    }
-  }
-
-  res.send(myDataset.graphs.default);
-  
-});
 
 app.post("/revokePublicAccess",async (req,res)=>
 {
@@ -242,17 +191,6 @@ app.post("/storetoPublicPod", async (req, res) => {
   res.send(`store data to solidpublicpod`);
 });
 
-
-app.get("/giveAccessTo", async (req, res) => {
-  const session = app.locals.session;
-  await access.setAgentAccess(
-    "https://pod.inrupt.com/pulkit/Notesdump/" + 'test',
-    'https://pod.inrupt.com/leslie/profile/card#me',
-    { read: true, write:true, append:false },
-    { fetch: session.fetch },
-  );
-  res.send("Added access to file for leslie")
-});
 
 
 app.post("/shareWithWebID", async (req, res) => {
@@ -477,3 +415,68 @@ app.listen(port, function()
   console.log("Listening on " + port);
 });
 
+
+// redundant endpoints
+
+// app.post("/reactNote", async (req, res) => {
+//   console.log("Here!")
+//   const session = app.locals.session;
+//   console.log(req.body)
+//   let courseSolidDataset = createSolidDataset();
+//   const newBookThing1 = buildThing(createThing({ name: req.body.title }))
+//     .addStringNoLocale(SCHEMA_INRUPT.name, "react generated note")
+//     .addStringNoLocale(SCHEMA_INRUPT.description, req.body.description)
+//     .addStringNoLocale(SCHEMA_INRUPT.text, req.body.description)
+//     .addUrl(RDF.type, "https://schema.org/TextDigitalDocument")
+//     .build();
+
+
+//   courseSolidDataset = setThing(courseSolidDataset, newBookThing1);
+//   // courseSolidDataset2 = setThing(courseSolidDataset2, newTextThing2);
+
+//   const savedSolidDataset = await saveSolidDatasetAt(
+//     "https://pod.inrupt.com/pulkit/Notesdump/" + req.body.title,
+//     courseSolidDataset,
+//     { fetch: session.fetch }             // fetch from authenticated Session
+//   );
+//   console.log("Here! Done writing")
+//   res.send(`sent data to pod`);
+// });
+
+
+// app.get("/readAllNotes", async (req, res) => {
+
+//   const notes_url = "https://pod.inrupt.com/pulkit/Notesdump/";
+//   const myDataset = await getSolidDataset(
+//     "https://pod.inrupt.com/pulkit/Notesdump/",
+//     { fetch: fetch }          // fetch from authenticated session
+//   );
+
+//   // console.log(myDataset)
+//   console.log(myDataset.graphs.default)
+
+//   notesFolder = myDataset.graphs.default
+
+//   for (const entry of Object.entries(notesFolder)) {
+//     if (entry[0]=="https://pod.inrupt.com/pulkit/Notesdump/"){
+//       console.log("USELESS");
+//     }
+//     else{
+//     console.log(entry);
+//     }
+//   }
+
+//   res.send(myDataset.graphs.default);
+  
+// });
+
+// app.get("/giveAccessTo", async (req, res) => {
+//   const session = app.locals.session;
+//   await access.setAgentAccess(
+//     "https://pod.inrupt.com/pulkit/Notesdump/" + 'test',
+//     'https://pod.inrupt.com/leslie/profile/card#me',
+//     { read: true, write:true, append:false },
+//     { fetch: session.fetch },
+//   );
+//   res.send("Added access to file for leslie")
+// });
