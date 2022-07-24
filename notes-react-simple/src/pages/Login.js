@@ -103,7 +103,7 @@ function create_auth_container(session) {
       0,
       session.info.webId.indexOf("/profile/card#me")
     );
-    let auth_url = baseUrl + "/notesAuth2";
+    let auth_url = baseUrl + "/notesAuth";
 
     console.log("IN CREATE_AUTH_CONTAINER before adding folder")
     save_auth(session, auth_url).then(()=>{})
@@ -193,11 +193,12 @@ export class LoginComponent extends Component {
           //   console.log(error);
           // }
 
+        // })
+        // .catch((e) => {
+        //   // error
+        //   console.log(e);
+        // });
         })
-        .catch((e) => {
-          // error
-          console.log(e);
-        });
 
     } else {
       let session = getDefaultSession();
