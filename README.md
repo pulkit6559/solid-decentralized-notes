@@ -55,43 +55,7 @@ password: Pulkit123@
 Once both are running go to `localhost:3000` to access the application.
 
 
-## Methods
-Here are all methods that work within the Solid framework and are the basis of the project: 
-- "CreateNotes"
-    - Being able to create notes, adding a title and description
-- "StoretoPublicPod"
-    - Saving a Note to the public pod, which is then accessible to all users that have access to the public pod
-- "GiveAccessTo"
-    - Give access to friend to private Note. Other users won't be able to access such note.
-- "readNote"
-    - Read the contents of all accessable nodes.
-
-## Functionalities of the frontend
-A decentralized data exchange application should contain the following functionalities:
-It provides an interface that allows fetching user data from a decentralized data store. It supports following functionalities:
-1. Within application between different user’s pods: User X can be allowed to view User Y’s info when given the appropriate permissions
-    - 1.1 Add Write/Read Access
-        - 1.1.1 Write access means that a shared note can be edited by User X
-        - 1.1.2 Read access means that a note is unchangable by any befriended user and can only be viewed
-2. Revoke friend access: User X isn't allowed to view User Y's info any longer
-3. Public sharing: A user can decide to make the data available for public usage
-4. Revoke public sharing: A created note by a user is being deleted from the public space and can't be viewed any more
-5. Edit notes: A User is able to change the description of a note that he created (or as already explained in (1.1.1) a note that has been shared with him with the "Write"-access authority)
-
-## Website pages and its contents
-1. Login: 
-    This will ensure and check whether the frontend has access to the Pod of the logged in user. Asks user to allow access to the data. A new login to the user's pod might be needed
-2. Home:
-    This is the home page
-3. Notes:
-    Here the note creating and editing, access management page
-4. Contacts
-    Adding Contacts to the user's friend list
-5. About
-    Information about the developers
-
-
-## Current Use Case Scenario
+## Using the Frontend
 Motivation: Allow users to make notes collaboratively
 What can our system do:
 1. Allows a user to create a note
@@ -118,6 +82,48 @@ What can our system do:
     * In the Notes page, Click on note you want to revoke access for
     * Enter the keyword 'public' in the text box  
     * Click on 'Revoke Access'
+
+
+
+## Methods
+Here are all methods that work within the Solid framework and are the basis of the project: 
+- Personal data management
+    * Add note
+    * Edit note
+    * Delete note
+- Sharing
+    * Create a public note
+    * Share a note with a different user (friend sharing)
+- Control
+    * Revoke public access to a note
+    * Revoke a friend’s access to a note
+- Collaboration
+    * Edit a shared writable note
+
+
+## Functionalities of the frontend
+A decentralized data exchange application should contain the following functionalities:
+It provides an interface that allows fetching user data from a decentralized data store. It supports following functionalities:
+1. Within application between different user’s pods: User X can be allowed to view User Y’s info when given the appropriate permissions
+    - 1.1 Add Write/Read Access
+        - 1.1.1 Write access means that a shared note can be edited by User X
+        - 1.1.2 Read access means that a note is unchangable by any befriended user and can only be viewed
+2. Revoke friend access: User X isn't allowed to view User Y's info any longer
+3. Public sharing: A user can decide to make the data available for public usage
+4. Revoke public sharing: A created note by a user is being deleted from the public space and can't be viewed any more
+5. Edit notes: A User is able to change the description of a note that he created (or as already explained in (1.1.1) a note that has been shared with him with the "Write"-access authority)
+
+## Website pages and its contents
+1. Login: 
+    This will ensure and check whether the frontend has access to the Pod of the logged in user. Asks user to allow access to the data. A new login to the user's pod might be needed
+2. Home:
+    This is the home page
+3. Notes:
+    Here the note creating and editing, access management page
+4. Contacts
+    Adding Contacts to the user's friend list
+5. About
+    Information about the developers
 
 
 ## Future possible work
@@ -151,10 +157,6 @@ Currently working on open issues:
 
 ## Current Issues
 - It is as of now impossible to update date while editing note
-
-## To-dos
-- Clean code
-- Finalise model
 
 
 ## Authors and acknowledgment
