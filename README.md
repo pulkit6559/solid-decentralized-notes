@@ -23,7 +23,7 @@ In order to run the code an installment of Node.js as well as npm is needed. Nod
 * npm install
 * npm start
 
-Now that the server is running authenticate the server pod
+Now that the server is running, authenticate the server pod
 
 * Open localhost:4444 in a browser
 * A prompt will ask for login credentials, use the ones provided below
@@ -95,10 +95,29 @@ It provides an interface that allows fetching user data from a decentralized dat
 Motivation: Allow users to make notes collaboratively
 What can our system do:
 1. Allows a user to create a note
+    * Click on 'Add Note' in the Notes page
+    * Enter note details
+    * Click on 'Save Note'
 2. Allow a user to share his notes with another user (read/edit privileges)
+    * Click on 'Add Note' in the Notes page
+    * Enter note details
+    * Enter the user's webID 
+    * Check appropriate privileges
+    * Click on 'Save Note'
 3. Public sharing of notes
+    * Click on 'Add Note' in the Notes page
+    * Enter note details
+    * Click on 'Save Note (public)'
 4. Display all notes for user
-5. Add friends and share notes with them
+    * All notes thet the user can read/write are displayed in the Notes page
+5. Revoke access for a user
+    * In the Notes page, Click on note you want to revoke access for
+    * Enter the user's webID 
+    * Click on 'Revoke Access'
+6. Revoke access for a user
+    * In the Notes page, Click on note you want to revoke access for
+    * Enter the keyword 'public' in the text box  
+    * Click on 'Revoke Access'
 
 
 ## Future possible work
