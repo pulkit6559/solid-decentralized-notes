@@ -3,6 +3,9 @@
 ## Name
 Solid Model Project: Sovereign Data Exchange Lab 2022 
 
+![Poster](https://github.com/pulkit6559/solid-decentralized-notes/blob/main/Poster/poster_solid_model.png?raw=true)
+
+
 ## Description
 This repository contains the Solid Model Project in the Sovereign Data Exchange Lab Course of the SS2022 at the RWTH Aachen. 
 Solid is a model that enables users to store their data in decentralized Pods, that are like personal web servers that can store data. Here any type of information can be saved within a Solid Pod, access control can be edited and the user has access at all times. 
